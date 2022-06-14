@@ -8,6 +8,7 @@ defmodule GuatemalaWeb.Router do
     plug :put_root_layout, {GuatemalaWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    #plug Phoenix.LiveView.Flash
   end
 
   pipeline :api do
