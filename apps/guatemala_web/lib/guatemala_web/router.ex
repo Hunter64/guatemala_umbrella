@@ -18,7 +18,9 @@ defmodule GuatemalaWeb.Router do
   scope "/", GuatemalaWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    # get "/", PageController, :index
+    get "/", HomeController, :index
+    get "/home", HomeController, :index
   end
 
   # Other scopes may use custom stacks.
