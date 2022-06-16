@@ -12,7 +12,7 @@ defmodule GuatemalaWeb.HomeComponent do
   def render(assigns) do
     ~H"""
       <div class="flex justify-center ml-96 mt-80">
-        Muebleria Guatemala
+        <img src="/images/logo-guatemala.png" />
       </div>
     """
   end
