@@ -43,6 +43,9 @@ defmodule GuatemalaWeb.HeaderComponent do
 
 
   defp get_menu() do
+
+    # <div onmouseover="showSubMenu({item.name})" onmouseout="hiddenSubMenu({item.name})">
+
     [
       %{
         parent: 1,
