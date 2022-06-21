@@ -1,3 +1,21 @@
+// let Hooks = {}
+
+// Hooks.SelectDarik = {
+//     mounted() {
+//         var data = this;
+        
+
+//         this.el.addEventListener("change", e => {
+//             console.log("----------> START E");
+//             var is_checked = e.target.checked;
+//             console.log(is_checked);
+//             data.pushEventTo("#homito", "switched_dark_mode", {
+//                 dark: is_checked
+//             })
+//         })
+//     }
+// };
+
 // We import the CSS which is extracted to its own file by esbuild.
 // Remove this line if you add a your own CSS build pipeline (e.g postcss).
 //import "../css/app.css"
@@ -27,6 +45,7 @@ import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+//let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}, hooks: Hooks})
 let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}})
 
 // Show progress bar on live navigation and form submits
