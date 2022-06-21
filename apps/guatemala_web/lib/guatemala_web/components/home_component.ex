@@ -18,8 +18,8 @@ defmodule GuatemalaWeb.HomeComponent do
         <div id="homito">
 
           <div class="inline-flex mt-20 w-full">
-            <div class="w-95/100"></div>
-            <div class="w-5/100">
+            <div class="w-99/100"></div>
+            <div class="w-1/100">
               <button>
                 <%= if @dark == "dark" do %>
                   <div class="tooltip" phx-click="change_mode" phx-value-mode="false" phx-target="#homito">
