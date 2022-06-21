@@ -18,4 +18,8 @@ defmodule GuatemalaWeb.HomeLiveView do
       )}
   end
 
+  def handle_info({_reference, %{url: url}}, socket) do
+    {:noreply, redirect(socket, to: url)}
+  end
+
 end
