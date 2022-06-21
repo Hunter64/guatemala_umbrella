@@ -17,19 +17,19 @@ defmodule GuatemalaWeb.HeaderComponent do
 
   def render(assigns) do
     ~H"""
-      <div class="fixed w-full py-2 bg-amber-300 top-0 left-0 z-40 border-b-2 border-amber-300">
+      <div class="fixed w-full py-2 bg-amber-300 dark:bg-slate-800 top-0 left-0 z-40 border-b-2 border-amber-300">
 
         <div class="flex">
           <img src="/images/logo-guatemala-re.png" class="w-56 ml-20"/>
         </div>
 
-        <div class="fixed top-0 left-0 h-screen px-2 bg-amber-300 block z-30 shadow-lg transition-menu w-16">
+        <div class="fixed top-0 left-0 h-screen px-2 bg-amber-300 dark:bg-slate-800 block z-30 shadow-lg transition-menu w-16">
           <div class="block h-16"></div>
           <%= for item <- @menu do %>
             <div class="block my-3 relative">
               <a href={item.link} class="rounded hover:border-gray-200 text-gray-800 hover:bg-gray-200 py-1 inline-flex items-center w-full tooltip">
                 <%= Phoenix.HTML.raw(item.icon) %>
-                <span class="text-xs absolute tooltip-text text-white bg-lime-500 ml-14 rounded"><b><%= item.name %></b></span>
+                <span class="text-xs absolute tooltip-text text-white bg-lime-500 dark:bg-slate-800 ml-14 rounded"><b><%= item.name %></b></span>
               </a>
             </div>
           <% end %>
