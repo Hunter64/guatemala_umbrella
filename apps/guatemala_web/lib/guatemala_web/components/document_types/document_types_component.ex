@@ -199,14 +199,44 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
       end
   end
 
+  def run_action(@edit_action, params, socket) do
+    document_type = params["id"] |> String.to_integer |> get_document_type_by_id()
+    document_type_pre =
+      %{
+        active: params["active"] == "on",
+        description: params["description"] |> String.trim() |> Generic.titelize_sentence,
+        modifier_user_id: 1,#socket.assigns.session.user_id |> String.to_integer,
+        name: params["name"] |> String.trim() |> Generic.titelize_sentence
+      }
+      validate_duplicated(document_type_pre, socket, document_type.id)
+      |> case do
+        true ->
+          DocumentTypes.update_document_type(document_type, document_type_pre)
+            |> case do
+              {:ok, document_type}
+                #-> update_socket_result(socket, "Instalador <b>" <> document_type.name <> "</b> editado correctamente", @success_message, @edit, document_type)
+                -> "Exito en el objetivo"
+                  |> IO.inspect(label: " -----> MENSAJE OK")
+              {:error, %Ecto.Changeset{} = changeset}
+                -> "Error al intentar modificar"
+                  |> IO.inspect(label: " -----> MENSAJE ERROR")
+                #-> update_socket_result(socket, "Error al intentar actualizar el Instalador " <> EctoUtil.get_errors(changeset), @error_message, @edit, document_type)
+            end
+        false ->
+          # update_socket_result(socket, "El registro ya existe", @error_message, @edit, document_type)
+          "El registro ya existe"
+          |> IO.inspect(label: " ----------------> ERROR")
+      end
+  end
+
   def validate_duplicated(document_type_pre, socket) do
     socket.assigns.document_types
       |> Enum.map(fn x -> x.name |> String.downcase() end)
       |> compare_names(document_type_pre.name |> String.downcase)
   end
-  def validate_duplicated(document_type_pre, socket, installer_id) do
+  def validate_duplicated(document_type_pre, socket, document_type_id) do
     socket.assigns.document_types
-      |> Enum.reject(fn installer -> installer.id == installer_id end)
+      |> Enum.reject(fn document_type -> document_type.id == document_type_id end)
       |> Enum.map(fn x -> x.name |> String.downcase() end)
       |> compare_names(document_type_pre.name |> String.downcase)
   end
