@@ -5,7 +5,12 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  alias Guatemala.DocumentTypes
+  alias Guatemala.DocumentTypes, as: DocumentTypes
+  alias Guatemala.GenericFunctions, as: Generic
+  alias Guatemala.EctoUtil, as: EctoUtil
+
+  @new_action 1
+  @edit_action 2
 
   def mount(socket) do
     {:ok, socket}
@@ -16,7 +21,9 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
       socket,
       new: false,
       edit: false,
-      document_types: get_document_types()
+      document_types: get_document_types(),
+      form_valid: init_fill_form(),
+      form: fill_form()
       )
     }
   end
@@ -25,14 +32,14 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
     ~H"""
       <div id="document_types" class="inline-flex w-full">
 
-          <div class="h-hoch-93 w-80 mt-16 ml-16 block float-left bg-amber-100">
-            <div class="w-full py-2 bg-amber-700">
+          <div class="h-hoch-93 w-80 mt-16 ml-16 block float-left bg-amber-100 dark:bg-slate-800">
+            <div class="w-full py-2 bg-amber-700 dark:bg-slate-800">
               <p class="ml-2 font-bold text-lg text-white">Tipos de Documentos</p>
             </div>
 
 
             <div class="w-1/2 px-2 mt-2">
-              <button phx-click="new_document_type" phx-target="#document_types" class="py-2 bg-green-500 hover:bg-green-400 text-white items-center inline-flex font-bold rounded text-sm w-full">
+              <button phx-click="new_document_type" phx-target="#document_types" class="py-2 bg-green-500 dark:bg-slate-800 hover:bg-green-400 text-white items-center inline-flex font-bold rounded text-sm w-full">
                 <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="h-4 w-4 mr-2 ml-auto">
                   <path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" class="text-white"></path>
                 </svg>
@@ -81,14 +88,14 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
             </div>
 
             <div class="w-full mt-2 px-2">
-              <label class="text-sm">Tipos de Documentos: <%= @document_types |> length %> </label>
+              <label class="text-sm text-black dark:text-white">Tipos de Documentos: <%= @document_types |> length %> </label>
             </div>
           </div>
 
           <div class="w-full">
             <%= @document_types |> Enum.count %>
-            <%= if @new, do: live_component(GuatemalaWeb.FormDocumentTypesComponent, id: "document_type", new: true, edit: false) %>
-            <%= if @edit, do: live_component(GuatemalaWeb.FormDocumentTypesComponent, id: @document_type_id, new: false, edit: true) %>
+            <%= if @new, do: live_component(GuatemalaWeb.FormDocumentTypesComponent, id: "document_type", new: true, edit: false, form_valid: @form_valid, form: @form) %>
+            <%= if @edit, do: live_component(GuatemalaWeb.FormDocumentTypesComponent, id: @document_type_id, new: false, edit: true, form_valid: @form_valid, form: @form) %>
           </div>
 
       </div>
@@ -116,6 +123,150 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
       document_type_id: params["id"] |> String.to_integer
       )}
   end
+
+  def handle_event("submit_form", params, socket) do
+    action = params["action"] |> String.to_integer
+    values = params
+
+    action |> IO.inspect(label: " -------------> ACTION")
+    values |> IO.inspect(label: " ------------> VALUES ")
+
+    valid =
+      params
+      |> Map.to_list()
+      |> validate_all_form(socket.assigns.form_valid)
+
+    valid
+    |> Map.to_list()
+    |> Generic.validate_all_form(true)
+    |> case do
+      false ->
+        {:noreply, assign(
+          socket,
+          form_valid: valid
+        )}
+      true ->
+        run_action(action, (if action == @new_action, do: socket.assigns.form, else: values), socket)
+    end
+  end
+
+  def handle_event("update_form", params, socket) do
+    target = params["_target"] |> List.first()
+    update = params
+      |> Map.get(target)
+
+    form_valid =
+      socket.assigns.form_valid
+      |> Generic.validate_form(target, update)
+
+    {:noreply, assign(
+      socket,
+      form: socket.assigns.form |> update_form(target, update),
+      form_valid: form_valid
+     )}
+  end
+
+  def run_action(@new_action, params, socket) do
+    document_type_pre = %{
+      active: true,
+      creator_user_id: 1,
+      description: params |> Map.get(:description) |> String.trim() |>Generic.titelize_sentence,
+      name: params |> Map.get(:name) |> String.trim() |> Generic.titelize_sentence
+    }
+    validate_duplicated(document_type_pre, socket)
+      |> case do
+        true ->
+          DocumentTypes.create_document_type(document_type_pre)
+            |> case do
+              {:ok, document_type}
+                ->
+                  "Tipo de Documento creado correctamente." |> IO.inspect(label: " ------> MENSAJE OK")
+                  document_type |> IO.inspect(label: " ---> Objeto Creado")
+              {:error, %Ecto.Changeset{} = changeset}
+                ->
+                  "Error -> " <> EctoUtil.get_errors(changeset)
+                    |> IO.inspect(label: " -----> MENSAJE ERROR")
+            end
+        false ->
+          "Registro Existente"
+            |> IO.inspect(label: " --------->")
+      end
+  end
+
+  def validate_duplicated(document_type_pre, socket) do
+    socket.assigns.document_types
+      |> Enum.map(fn x -> x.name |> String.downcase() end)
+      |> compare_names(document_type_pre.name |> String.downcase)
+  end
+  def validate_duplicated(document_type_pre, socket, installer_id) do
+    socket.assigns.document_types
+      |> Enum.reject(fn installer -> installer.id == installer_id end)
+      |> Enum.map(fn x -> x.name |> String.downcase() end)
+      |> compare_names(document_type_pre.name |> String.downcase)
+  end
+
+  defp compare_names(names, name) do
+    name
+      |> String.downcase()
+      |> exist_string_in_list?(names)
+      |> Kernel.!
+  end
+
+  defp exist_string_in_list?(string, list), do: string in list
+
+  defp update_form(form, target, update, _aux \\ "") do
+    form
+      |> Map.put(target |> String.to_atom(), update)
+  end
+
+  defp fill_form() do
+    Map.new
+    |> Map.put(:name, "")
+    |> Map.put(:description, "")
+  end
+
+  defp init_fill_form() do
+    %{}
+    |> Map.put(:id, %{
+      valid: true,
+      required: [],
+      message: ""
+    })
+    |> Map.put(:action, %{
+      valid: true,
+      required: [],
+      message: ""
+    })
+    |> Map.put(:active, %{
+      valid: true,
+      required: [],
+      message: ""
+    })
+    |> Map.put(:description, %{
+        valid: true,
+        required: [
+          %{func: &Generic.required/1, message: "El valor es requerido"}
+        ],
+        message: ""
+      })
+      |> Map.put(:name, %{
+        valid: true,
+        required: [
+          %{func: &Generic.required/1, message: "El valor es requerido"}
+        ],
+        message: ""
+      })
+  end
+
+  defp validate_all_form([{target, value} | others], validators) do
+    validators =
+      validators
+      |> Generic.validate_form(target, value)
+
+    validate_all_form(others, validators)
+  end
+
+  defp validate_all_form([], validators), do: validators
 
   def get_document_types() do
     DocumentTypes.list_document_types
