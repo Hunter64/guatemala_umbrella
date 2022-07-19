@@ -120,6 +120,8 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
       socket,
       new: false,
       edit: true,
+      form: params["id"] |> String.to_integer |> get_document_type_by_id() |> IO.inspect(label: " ---------------> FORM "),
+      form_valid?: init_fill_form(),
       document_type_id: params["id"] |> String.to_integer
       )}
   end
@@ -164,6 +166,10 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
       form: socket.assigns.form |> update_form(target, update),
       form_valid: form_valid
      )}
+  end
+
+  def get_document_type_by_id(id) do
+    DocumentTypes.get_document_type!(id)
   end
 
   def run_action(@new_action, params, socket) do
