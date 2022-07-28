@@ -19,7 +19,7 @@ defmodule GuatemalaWeb.FormDocumentTypesComponent do
       new: attrs.new,
       edit: attrs.edit,
       document_type: document_type,
-      form_valid: attrs.form_valid,
+      form_valid: attrs.form_valid |> IO.inspect(label: " ------------------------> FORM VALID IN FORM "),
       form: attrs.form |> IO.inspect(label: " -----------------> FORM ")
     )}
   end
@@ -48,18 +48,16 @@ defmodule GuatemalaWeb.FormDocumentTypesComponent do
               <label class="block tracking-wide text-gray-700 font-bold">*Nombre</label>
               <input value={@form.name}
                 type="text" style="text-transform: uppercase" name="name" maxlength="255" class="border-blue-100 text-sm focus:outline-none focus:bg-white focus:border-blue-500 appearance-none block w-full bg-blue-50 text-gray-700 border rounded py-2 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" placeholder="Introduce el Nombre" >
-              <%= if !@form_valid.name.valid do %>
                 <div class="-mt-2.5 text-red-700 text-xs font-medium"><%= @form_valid.name.message %></div>
-              <% end %>
             </div>
 
             <div class="py-1">
               <label class="block tracking-wide text-gray-700 font-bold">*Descripción</label>
               <input value={@form.description}
                 type="text" style="text-transform: uppercase" name="description" maxlength="255" class="border-blue-100 text-sm focus:outline-none focus:bg-white focus:border-blue-500 appearance-none block w-full bg-blue-50 text-gray-700 border rounded py-2 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" placeholder="Introduce la Descripción" >
-              <%= if !@form_valid.description.valid do %>
+
                 <div class="-mt-2.5 text-red-700 text-xs font-medium"><%= @form_valid.description.message %></div>
-              <% end %>
+
             </div>
 
               <button type="submit" form="form1" class="ml-5 py-2 w-32 bg-green-500 text-white hover:bg-green-400 items-center inline-flex font-bold rounded shadow focus:shadow-outline focus:outline-none rounded">

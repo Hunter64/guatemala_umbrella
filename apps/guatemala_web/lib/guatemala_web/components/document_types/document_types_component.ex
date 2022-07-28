@@ -8,9 +8,13 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
   alias Guatemala.DocumentTypes, as: DocumentTypes
   alias Guatemala.GenericFunctions, as: Generic
   alias Guatemala.EctoUtil, as: EctoUtil
+  alias GuatemalaWeb.SuccesfullyComponent, as: Notification
 
   @new_action 1
   @edit_action 2
+
+  @success_message 1
+  @error_message 2
 
   def mount(socket) do
     {:ok, socket}
@@ -23,7 +27,10 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
       edit: false,
       document_types: get_document_types(),
       form_valid: init_fill_form(),
-      form: fill_form()
+      form: fill_form(),
+      header: nil,
+      description: nil,
+      change: false
       )
     }
   end
@@ -96,6 +103,7 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
             <%= @document_types |> Enum.count %>
             <%= if @new, do: live_component(GuatemalaWeb.FormDocumentTypesComponent, id: "document_type", new: true, edit: false, form_valid: @form_valid, form: @form) %>
             <%= if @edit, do: live_component(GuatemalaWeb.FormDocumentTypesComponent, id: @document_type_id, new: false, edit: true, form_valid: @form_valid, form: @form) %>
+            <%= if @description, do: live_component(GuatemalaWeb.SuccesfullyComponent, id: "notification", header: "Succesfully Saved!", description: "Anyone with a link can now view this file.", show: true, notification_type: "notification", change: @change) %>
           </div>
 
       </div>
@@ -109,6 +117,8 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
       socket,
       new: true,
       edit: false,
+      form: fill_form(),
+      form_valid: init_fill_form(),
       document_type_id: 0,
       document_types: get_document_types()
       )}
@@ -121,7 +131,7 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
       new: false,
       edit: true,
       form: params["id"] |> String.to_integer |> get_document_type_by_id() |> IO.inspect(label: " ---------------> FORM "),
-      form_valid?: init_fill_form(),
+      form_valid: init_fill_form(),
       document_type_id: params["id"] |> String.to_integer
       )}
   end
@@ -153,6 +163,7 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
   end
 
   def handle_event("update_form", params, socket) do
+    params |> IO.inspect(label: " ----------------> PARAMS UPDATE FORM ")
     target = params["_target"] |> List.first()
     update = params
       |> Map.get(target)
@@ -160,6 +171,7 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
     form_valid =
       socket.assigns.form_valid
       |> Generic.validate_form(target, update)
+      |> IO.inspect(label: " ------------------>>>>> FORM VALID ")
 
     {:noreply, assign(
       socket,
@@ -214,9 +226,9 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
           DocumentTypes.update_document_type(document_type, document_type_pre)
             |> case do
               {:ok, document_type}
-                #-> update_socket_result(socket, "Instalador <b>" <> document_type.name <> "</b> editado correctamente", @success_message, @edit, document_type)
-                -> "Exito en el objetivo"
-                  |> IO.inspect(label: " -----> MENSAJE OK")
+                -> update_socket_result(socket, "Tipo de documento <b>" <> document_type.name <> "</b> editado correctamente", @success_message, @edit_action, document_type)
+                # -> "Exito en el objetivo"
+                #   |> IO.inspect(label: " -----> MENSAJE OK")
               {:error, %Ecto.Changeset{} = changeset}
                 -> "Error al intentar modificar"
                   |> IO.inspect(label: " -----> MENSAJE ERROR")
@@ -227,6 +239,35 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
           "El registro ya existe"
           |> IO.inspect(label: " ----------------> ERROR")
       end
+  end
+
+  def update_socket_result(socket, msg, status_message, action, pre) do
+    status_message
+      |> case do
+        @success_message ->
+          Notification.set_timer_notificacion()
+        @error_message ->
+          Notification.set_timer_notification_error()
+        _ ->
+          Notification.set_timer_notificacion()
+      end
+
+    {:noreply, assign(
+      socket,
+      document_types: get_document_types(),
+      ##document_types_non_filtered: get_document_types(),
+      document_type_id: (if action == @edit_action, do: pre.id, else: 0),
+      new: (if action == @new_action, do: (if status_message == @error_message, do: true), else: false),
+      edit: (if action == @edit_action, do: (if status_message == @error_message, do: true), else: false),
+      header: "OTHER",
+      description: (if status_message == @success_message, do: msg, else: nil),
+      #message_error: (if status_message == @error_message, do: msg, else: nil),
+      change: !socket.assigns.change,
+      #session: socket.assigns.session,
+      form_valid?: init_fill_form(),
+      form: socket.assigns.form
+      )
+    }
   end
 
   def validate_duplicated(document_type_pre, socket) do
