@@ -689,7 +689,10 @@ video {
   /*For without border in span tooltip*/
   outline: 0;
 }
-
+  /* For animate msg confirmation */
+.zum:active {
+  transform: translateY(4px);
+}
 @-webkit-keyframes fade-in-scale-keys{
   0% {
     scale: 0.95;
