@@ -8,13 +8,14 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
   alias Guatemala.DocumentTypes, as: DocumentTypes
   alias Guatemala.GenericFunctions, as: Generic
   alias Guatemala.EctoUtil, as: EctoUtil
-  alias GuatemalaWeb.SuccesfullyComponent, as: Notification
+  alias GuatemalaWeb.NotificationComponent, as: Notification
 
   @new_action 1
   @edit_action 2
 
   @success_message 1
   @error_message 2
+  @warning_message 3
 
   def mount(socket) do
     {:ok, socket}
@@ -29,7 +30,7 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
       form_valid: init_fill_form(),
       form: fill_form(),
       header: nil,
-      description: nil,
+      description_alert: nil,
       change: false
       )
     }
@@ -103,7 +104,8 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
             <%= @document_types |> Enum.count %>
             <%= if @new, do: live_component(GuatemalaWeb.FormDocumentTypesComponent, id: "document_type", new: true, edit: false, form_valid: @form_valid, form: @form) %>
             <%= if @edit, do: live_component(GuatemalaWeb.FormDocumentTypesComponent, id: @document_type_id, new: false, edit: true, form_valid: @form_valid, form: @form) %>
-            <%= if @description, do: live_component(GuatemalaWeb.SuccesfullyComponent, id: "notification", header: "Succesfully Saved!", description: "Anyone with a link can now view this file.", show: true, notification_type: "notification", change: @change) %>
+            <%= if @description_alert, do: live_component(GuatemalaWeb.NotificationComponent, id: @notification_type, header: @header, description_alert: @description_alert, show: true, notification_type: @notification_type, change: @change) %>
+
           </div>
 
       </div>
@@ -198,16 +200,13 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
             |> case do
               {:ok, document_type}
                 ->
-                  "Tipo de Documento creado correctamente." |> IO.inspect(label: " ------> MENSAJE OK")
-                  document_type |> IO.inspect(label: " ---> Objeto Creado")
+                  update_socket_result(socket, "Éxito", "Tipo de documento " <> document_type.name <> " creado correctamente", @success_message, @new_action, 0, "succesfully")
               {:error, %Ecto.Changeset{} = changeset}
                 ->
-                  "Error -> " <> EctoUtil.get_errors(changeset)
-                    |> IO.inspect(label: " -----> MENSAJE ERROR")
+                  update_socket_result(socket, "Error", "Error al intentar guardar el Tipo de documento " <> EctoUtil.get_errors(changeset), @error_message, @new_action, 0, "error")
             end
         false ->
-          "Registro Existente"
-            |> IO.inspect(label: " --------->")
+          update_socket_result(socket, "Advertencia", "El registro que intenta guardar ya existe, favor de revisar", @warning_message, @new_action, 0, "warning")
       end
   end
 
@@ -218,36 +217,46 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
         active: params["active"] == "on",
         description: params["description"] |> String.trim() |> Generic.titelize_sentence,
         modifier_user_id: 1,#socket.assigns.session.user_id |> String.to_integer,
-        name: params["name"] |> String.trim() |> Generic.titelize_sentence
+        name: params["name"] |> String.trim() |> Generic.titelize_sentence,
+        creator_user_id: 1
       }
       validate_duplicated(document_type_pre, socket, document_type.id)
       |> case do
         true ->
-          DocumentTypes.update_document_type(document_type, document_type_pre)
+          # change = Guatemala.DocumentTypes.DocumentType.changeset(%Guatemala.DocumentTypes.DocumentType{}, document_type_pre)
+
+          are_changes(document_type, document_type_pre)
             |> case do
-              {:ok, document_type}
-                -> update_socket_result(socket, "Tipo de documento <b>" <> document_type.name <> "</b> editado correctamente", @success_message, @edit_action, document_type)
-                # -> "Exito en el objetivo"
-                #   |> IO.inspect(label: " -----> MENSAJE OK")
-              {:error, %Ecto.Changeset{} = changeset}
-                -> "Error al intentar modificar"
-                  |> IO.inspect(label: " -----> MENSAJE ERROR")
-                #-> update_socket_result(socket, "Error al intentar actualizar el Instalador " <> EctoUtil.get_errors(changeset), @error_message, @edit, document_type)
+              true ->
+                DocumentTypes.update_document_type(document_type, document_type_pre)
+                |> case do
+                  {:ok, document_type}
+                    -> update_socket_result(socket, "Éxito", "Tipo de documento " <> document_type.name <> " editado correctamente", @success_message, @edit_action, document_type.id, "succesfully")
+                  {:error, %Ecto.Changeset{} = changeset}
+                    -> update_socket_result(socket, "Error", "Error al intentar actualizar el Tipo de documento " <> EctoUtil.get_errors(changeset), @error_message, @edit_action, document_type.id, "error")
+                end
+
+              false ->
+                update_socket_result(socket, "Advertencia", "No existen cambios por aplicar, favor de revisar", @warning_message, @edit_action, document_type.id, "warning")
             end
+
+
         false ->
-          # update_socket_result(socket, "El registro ya existe", @error_message, @edit, document_type)
-          "El registro ya existe"
-          |> IO.inspect(label: " ----------------> ERROR")
+          update_socket_result(socket, "Advertencia", "El registro ya existe en la base de datos, favor de revisar.", @warning_message, @edit_action, document_type.id, "warning")
       end
   end
 
-  def update_socket_result(socket, msg, status_message, action, pre) do
+  ##TRABAJANDO EN DIF SUCCESFULLY AND ERROR ALERT
+
+  def update_socket_result(socket, header, msg, status_message, action, document_type_id, notification_type) do
     status_message
       |> case do
         @success_message ->
           Notification.set_timer_notificacion()
         @error_message ->
           Notification.set_timer_notification_error()
+        @warning_message ->
+            Notification.set_timer_notification_warning()
         _ ->
           Notification.set_timer_notificacion()
       end
@@ -256,16 +265,16 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
       socket,
       document_types: get_document_types(),
       ##document_types_non_filtered: get_document_types(),
-      document_type_id: (if action == @edit_action, do: pre.id, else: 0),
+      document_type_id: document_type_id,
       new: (if action == @new_action, do: (if status_message == @error_message, do: true), else: false),
       edit: (if action == @edit_action, do: (if status_message == @error_message, do: true), else: false),
-      header: "OTHER",
-      description: (if status_message == @success_message, do: msg, else: nil),
-      #message_error: (if status_message == @error_message, do: msg, else: nil),
+      header: header,
+      description_alert: msg,
       change: !socket.assigns.change,
       #session: socket.assigns.session,
       form_valid?: init_fill_form(),
-      form: socket.assigns.form
+      form: socket.assigns.form,
+      notification_type: notification_type
       )
     }
   end
@@ -287,6 +296,10 @@ defmodule GuatemalaWeb.DocumentTypeComponent do
       |> String.downcase()
       |> exist_string_in_list?(names)
       |> Kernel.!
+  end
+
+  def are_changes(document_type, document_type_pre) do
+    !(document_type.name == document_type_pre.name && document_type.description == document_type_pre.description)
   end
 
   defp exist_string_in_list?(string, list), do: string in list

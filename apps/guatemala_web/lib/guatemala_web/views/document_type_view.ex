@@ -20,8 +20,9 @@ defmodule GuatemalaWeb.DocumentTypeLiveView do
 
   def handle_info({_reference, %{message: params}}, socket) do
     case params do
-      "close_notification" -> send_update(GuatemalaWeb.SuccesfullyComponent, id: "notification", show: false)
-      "close_notification_error" -> send_update(GuatemalaWeb.SuccesfullyComponent, id: "notification_error", show: false)
+      "close_notification" -> send_update(GuatemalaWeb.NotificationComponent, id: "succesfully", show: false)
+      "close_notification_error" -> send_update(GuatemalaWeb.NotificationComponent, id: "error", show: false)
+      "close_notification_warning" -> send_update(GuatemalaWeb.NotificationComponent, id: "warning", show: false)
     end
     {:noreply, socket}
   end
