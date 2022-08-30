@@ -22,6 +22,7 @@ defmodule GuatemalaWeb.Router do
     get "/", HomeController, :index
     get "/home", HomeController, :index
     get "/document_types", DocumentTypeController, :index
+    get "/catalogs", CatalogController, :index
   end
 
   # Other scopes may use custom stacks.
