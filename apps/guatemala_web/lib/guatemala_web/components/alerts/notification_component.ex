@@ -1,6 +1,6 @@
 defmodule GuatemalaWeb.NotificationComponent do
   @moduledoc """
-    Componente de mensaje de confirmación / exito
+    Componente de mensaje de confirmación / exito / error / adevertencia
   """
   use Phoenix.LiveComponent
   use Phoenix.HTML
