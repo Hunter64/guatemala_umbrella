@@ -1,8 +1,11 @@
 defmodule GuatemalaWeb.CatalogController do
   use GuatemalaWeb, :controller
 
-  alias Guatemala.Catalogs
-  alias Guatemala.Catalogs.Catalog
+  # alias Guatemala.Catalogs
+  # alias Guatemala.Catalogs.Catalog
+
+  alias Phoenix.LiveView
+  alias GuatemalaWeb.UtilController
 
   def index(conn, _params) do
     conn
