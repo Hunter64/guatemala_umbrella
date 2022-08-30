@@ -43,7 +43,7 @@ defmodule GuatemalaWeb.CatalogComponent do
 
           <div class="h-hoch-93 w-80 mt-16 ml-16 block float-left bg-amber-100 dark:bg-slate-800">
             <div class="w-full py-2 bg-amber-700 dark:bg-slate-800">
-              <p class="ml-2 font-bold text-lg text-white">Catálogos</p>
+              <p class="ml-2 font-bold text-lg text-white">Tipos de Catálogos</p>
             </div>
 
 
@@ -97,7 +97,7 @@ defmodule GuatemalaWeb.CatalogComponent do
             </div>
 
             <div class="w-full mt-2 px-2">
-              <label class="text-sm text-black dark:text-white">Catálogos: <%= @catalogs |> length %> </label>
+              <label class="text-sm text-black dark:text-white">Tipos de Catálogos: <%= @catalogs |> length %> </label>
             </div>
           </div>
 
@@ -201,10 +201,10 @@ defmodule GuatemalaWeb.CatalogComponent do
             |> case do
               {:ok, catalog}
                 ->
-                  update_socket_result(socket, "Éxito", "Catálogo " <> catalog.name <> " creado correctamente", @success_message, @new_action, 0, "succesfully")
+                  update_socket_result(socket, "Éxito", "El Tipo de Catálogo " <> catalog.name <> " creado correctamente", @success_message, @new_action, 0, "succesfully")
               {:error, %Ecto.Changeset{} = changeset}
                 ->
-                  update_socket_result(socket, "Error", "Error al intentar guardar el Catálogo " <> EctoUtil.get_errors(changeset), @error_message, @new_action, 0, "error")
+                  update_socket_result(socket, "Error", "Error al intentar guardar el Tipo de Catálogo " <> EctoUtil.get_errors(changeset), @error_message, @new_action, 0, "error")
             end
         false ->
           update_socket_result(socket, "Advertencia", "El registro que intenta guardar ya existe, favor de revisar", @warning_message, @new_action, 0, "warning")
@@ -232,9 +232,9 @@ defmodule GuatemalaWeb.CatalogComponent do
                 Catalogs.update_catalog(catalog, catalog_pre)
                 |> case do
                   {:ok, catalog}
-                    -> update_socket_result(socket, "Éxito", "Catálogo " <> catalog.name <> " editado correctamente", @success_message, @edit_action, catalog.id, "succesfully")
+                    -> update_socket_result(socket, "Éxito", "Tipo de Catálogo " <> catalog.name <> " editado correctamente", @success_message, @edit_action, catalog.id, "succesfully")
                   {:error, %Ecto.Changeset{} = changeset}
-                    -> update_socket_result(socket, "Error", "Error al intentar actualizar el Catálogo " <> EctoUtil.get_errors(changeset), @error_message, @edit_action, catalog.id, "error")
+                    -> update_socket_result(socket, "Error", "Error al intentar actualizar el Tipo de Catálogo " <> EctoUtil.get_errors(changeset), @error_message, @edit_action, catalog.id, "error")
                 end
 
               false ->
