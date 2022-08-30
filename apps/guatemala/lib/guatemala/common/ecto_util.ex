@@ -11,7 +11,7 @@ defmodule Guatemala.EctoUtil do
   end
 
   defp get_errors([{atom, {message, _array}} | tail], error) do
-    get_errors(tail, error <> "#{atom}: #{message}<br>")
+    get_errors(tail, error <> "#{atom}: #{message}")
   end
 
 end
