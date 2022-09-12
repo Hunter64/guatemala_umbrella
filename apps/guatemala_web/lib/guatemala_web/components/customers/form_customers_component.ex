@@ -5,7 +5,8 @@ defmodule GuatemalaWeb.FormCustomersComponent do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  alias Guatemala.DocumentTypes
+  # alias GuatemalaWeb.NotificationComponent, as: Notification
+  alias Guatemala.Customers, as: Customers
 
   def mount(socket) do
     {:ok, socket}
@@ -16,7 +17,8 @@ defmodule GuatemalaWeb.FormCustomersComponent do
 
     {:ok, assign(socket,
       new: false,
-      edit: false
+      edit: false,
+      list: false
     )}
 
     # {:ok, assign(socket,
@@ -91,12 +93,27 @@ defmodule GuatemalaWeb.FormCustomersComponent do
         </div>
 
         <div class="w-full">
-          <%= if @new, do: live_component(GuatemalaWeb.FormNewEditCustomersComponent, id: "new_customer", new: true, edit: false) %>
-          <%= if @edit, do: live_component(GuatemalaWeb.FormNewEditCustomersComponent, id: "edit_customer", new: false, edit: true) %>
+          <%= if @new, do: live_component(GuatemalaWeb.FormNewEditCustomersComponent, id: "new_customer", new: true, edit: false, list: false) %>
+          <%= if @edit, do: live_component(GuatemalaWeb.FormNewEditCustomersComponent, id: "edit_customer", new: false, edit: true, list: false) %>
+          <%= if @list, do: live_component(GuatemalaWeb.ListCustomersComponent, id: "list_customers", new: false, edit: false, list: true) %>
         </div>
 
       </div>
     """
+  end
+
+  def handle_event("search_customers", params, socket) do
+    IO.puts("HERE ------------> Search ")
+    params |> IO.inspect(label: " --------------------> params ")
+    all_customers = Customers.list_customers()
+    all_customers |> IO.inspect(label: " ------------------------------------>>>>> ALL ")
+
+    {:noreply, assign(
+      socket,
+      new: false,
+      edit: false,
+      list: true
+      )}
   end
 
   def handle_event("new_customer", _params, socket) do
@@ -104,7 +121,8 @@ defmodule GuatemalaWeb.FormCustomersComponent do
     {:noreply, assign(
       socket,
       new: true,
-      edit: false
+      edit: false,
+      list: false
       )}
   end
 
