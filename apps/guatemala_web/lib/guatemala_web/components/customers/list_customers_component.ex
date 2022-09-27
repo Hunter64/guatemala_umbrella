@@ -111,7 +111,7 @@ defmodule GuatemalaWeb.ListCustomersComponent do
                         </tbody>
 
                     </table>
-                    <div class="w-full text-white mt-2">
+                    <div class="w-full text-black dark:text-white mt-2">
                       Total de Registros:  <b><%= @all_customers |> Enum.count %></b>
                     </div>
                 </div>

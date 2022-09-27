@@ -7,6 +7,7 @@ defmodule GuatemalaWeb.FormNewEditCustomersComponent do
 
   alias Guatemala.GenericFunctions, as: Generic
   alias Guatemala.Customers, as: Customers
+  alias Guatemala.EctoUtil, as: EctoUtil
 
   def mount(socket) do
     {:ok, socket}
@@ -149,9 +150,18 @@ defmodule GuatemalaWeb.FormNewEditCustomersComponent do
     }
 
     customer_pre
+      |> IO.inspect(label: " -------------> CUSOTMER PER")
       |> Customers.create_customer()
-      |> create_email()
-      |> IO.inspect(label: " -------------------> NEW CUSTOMER ?")
+      |> case do
+        {:ok, customer}
+          ->
+            create_email(customer_pre.email, customer.id)
+            create_phone(customer_pre.phone, customer.id)
+        {:error, %Ecto.Changeset{} = changeset}
+          ->
+            "Error" <> EctoUtil.get_errors(changeset)
+      end
+
 
     {:noreply, assign(
       socket,
@@ -160,8 +170,39 @@ defmodule GuatemalaWeb.FormNewEditCustomersComponent do
     }
   end
 
-  def create_email(customer) do
+  def create_email("", _customer_id) do
+    nil
+  end
 
+  def create_email(email, customer_id) do
+    %{
+      active: true,
+      catalog_id: 1,
+      creator_user_id: 1,
+      email: email,
+      owner_id: customer_id
+    }
+    |> Guatemala.Emails.create_email()
+    |> IO.inspect(label: " --------------> CREATE EMAIL")
+  end
+
+  def create_phone("", _customer_id) do
+    nil
+  end
+
+  def create_phone(phone, customer_id) do
+    %{
+      active: true,
+      catalog_id: 1,
+      country_code: "52",
+      creator_user_id: 1,
+      extension: "00",
+      lada_code: "55",
+      number: phone,
+      owner_id: customer_id
+    }
+    |> Guatemala.Phones.create_phone()
+    |> IO.inspect(label: " -----------------> CREATE PHONE")
   end
 
   def get_large_name(params) do
