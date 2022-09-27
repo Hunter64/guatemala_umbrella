@@ -18,7 +18,9 @@ defmodule GuatemalaWeb.ListCustomersComponent do
       new: false,
       edit: false,
       list: true,
-      all_customers: Customers.list_customers() |> add_emails() |> IO.inspect(label: " ---------------> LIST CUSTOMERS ")
+      all_customers: Customers.list_customers()
+        |> add_email_and_phone()
+        |> IO.inspect(label: " ---------------> LIST CUSTOMERS ")
     )}
 
   end
@@ -74,7 +76,7 @@ defmodule GuatemalaWeb.ListCustomersComponent do
                                   </div>
                               </td>
                               <td class="p-2 whitespace-nowrap w-15/100">
-                                  <div class="text-left">5578457845</div>
+                                  <div class="text-left"><%= item.phone %></div>
                               </td>
                               <td class="p-2 whitespace-nowrap w-15/100">
                                   <div class="text-left font-medium"><%= item.email %></div>
@@ -121,9 +123,13 @@ defmodule GuatemalaWeb.ListCustomersComponent do
     """
   end
 
-  def add_emails(list_customers) do
+  def add_email_and_phone(list_customers) do
     list_customers
-      |> Enum.map(fn x -> x |> Map.put(:email, x.id |> get_email_data()) end)
+      |> Enum.map(fn x ->
+        x
+          |> Map.put(:email, x.id |> get_email_data())
+          |> Map.put(:phone, x.id |> get_phone_data())
+        end)
   end
 
   def get_email_data(customer_id) do
@@ -139,6 +145,21 @@ defmodule GuatemalaWeb.ListCustomersComponent do
   def get_email(email_data) do
     email_data
       |> Map.get(:email)
+  end
+
+  def get_phone_data(customer_id) do
+    customer_id
+      |> Guatemala.Phones.get_first_active_phone_owner_id()
+      |> get_phone()
+  end
+
+  def get_phone(nil) do
+    "Sin Teléfono"
+  end
+
+  def get_phone(phone_data) do
+    phone_data
+      |> Map.get(:number)
   end
 
 end

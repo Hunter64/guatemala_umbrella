@@ -143,11 +143,14 @@ defmodule GuatemalaWeb.FormNewEditCustomersComponent do
       rfc: "XAXX010101000",
       second_name: params["second_name"] |> String.trim() |> Generic.titelize_sentence,
       second_surname: params["second_surname"] |> String.trim() |> Generic.titelize_sentence,
-      social_reason: "XXX"
+      social_reason: "XXX",
+      email: params["email"],
+      phone: params["phone"]
     }
 
     customer_pre
       |> Customers.create_customer()
+      |> create_email()
       |> IO.inspect(label: " -------------------> NEW CUSTOMER ?")
 
     {:noreply, assign(
@@ -155,6 +158,10 @@ defmodule GuatemalaWeb.FormNewEditCustomersComponent do
       x: "adsf"
       )
     }
+  end
+
+  def create_email(customer) do
+
   end
 
   def get_large_name(params) do
