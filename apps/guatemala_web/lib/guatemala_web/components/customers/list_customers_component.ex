@@ -18,7 +18,7 @@ defmodule GuatemalaWeb.ListCustomersComponent do
       new: false,
       edit: false,
       list: true,
-      all_customers: Customers.list_customers()
+      all_customers: Customers.list_customers() |> add_emails() |> IO.inspect(label: " ---------------> LIST CUSTOMERS ")
     )}
 
   end
@@ -77,7 +77,7 @@ defmodule GuatemalaWeb.ListCustomersComponent do
                                   <div class="text-left">5578457845</div>
                               </td>
                               <td class="p-2 whitespace-nowrap w-15/100">
-                                  <div class="text-left font-medium">test@gmail.com</div>
+                                  <div class="text-left font-medium"><%= item.email %></div>
                               </td>
                               <td class="p-2 whitespace-nowrap w-10/100">
                                 <%= if item.active do %>
@@ -120,4 +120,25 @@ defmodule GuatemalaWeb.ListCustomersComponent do
 
     """
   end
+
+  def add_emails(list_customers) do
+    list_customers
+      |> Enum.map(fn x -> x |> Map.put(:email, x.id |> get_email_data()) end)
+  end
+
+  def get_email_data(customer_id) do
+    customer_id
+      |> Guatemala.Emails.get_first_active_email_owner_id
+      |> get_email()
+  end
+
+  def get_email(nil) do
+    "Sin correo"
+  end
+
+  def get_email(email_data) do
+    email_data
+      |> Map.get(:email)
+  end
+
 end

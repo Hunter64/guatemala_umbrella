@@ -101,4 +101,10 @@ defmodule Guatemala.Emails do
   def change_email(%Email{} = email, attrs \\ %{}) do
     Email.changeset(email, attrs)
   end
+
+  def get_first_active_email_owner_id(owner_id) do
+    list_emails()
+      |> Enum.filter(fn x -> x.owner_id == owner_id and x.active end)
+      |> List.first()
+  end
 end
