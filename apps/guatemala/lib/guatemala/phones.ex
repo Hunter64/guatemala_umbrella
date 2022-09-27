@@ -101,4 +101,11 @@ defmodule Guatemala.Phones do
   def change_phone(%Phone{} = phone, attrs \\ %{}) do
     Phone.changeset(phone, attrs)
   end
+
+  def get_first_active_phone_owner_id(owner_id) do
+    list_phones()
+      |> Enum.filter(fn x -> x.owner_id == owner_id and x.active end)
+      |> List.first()
+  end
+
 end
