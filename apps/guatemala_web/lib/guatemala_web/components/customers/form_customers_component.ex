@@ -93,8 +93,8 @@ defmodule GuatemalaWeb.FormCustomersComponent do
         </div>
 
         <div class="w-full">
-          <%= if @new, do: live_component(GuatemalaWeb.FormNewEditCustomersComponent, id: "new_customer", new: true, edit: false, list: false) %>
-          <%= if @edit, do: live_component(GuatemalaWeb.FormNewEditCustomersComponent, id: "edit_customer", new: false, edit: true, list: false) %>
+          <%= if @new, do: live_component(GuatemalaWeb.FormNewCustomersComponent, id: "new_customer", new: true, edit: false, list: false) %>
+          <%= if @edit, do: live_component(GuatemalaWeb.FormNewCustomersComponent, id: "edit_customer", new: false, edit: true, list: false) %>
           <%= if @list, do: live_component(GuatemalaWeb.ListCustomersComponent, id: "list_customers", new: false, edit: false, list: true) %>
         </div>
 

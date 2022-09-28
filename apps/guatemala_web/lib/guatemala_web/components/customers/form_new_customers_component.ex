@@ -1,4 +1,4 @@
-defmodule GuatemalaWeb.FormNewEditCustomersComponent do
+defmodule GuatemalaWeb.FormNewCustomersComponent do
   @moduledoc """
   Form Create New Customers
   """

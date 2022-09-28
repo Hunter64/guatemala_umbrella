@@ -158,8 +158,8 @@ defmodule GuatemalaWeb.ListCustomersComponent do
   end
 
   def get_phone(phone_data) do
-    phone_data
-      |> Map.get(:number)
+    "(" <> phone_data.lada_code <> ")" <> phone_data.number |> IO.inspect(label: " -------------------> NUMBER")
+      # |> Map.get(:number)
   end
 
 end
