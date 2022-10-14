@@ -20,7 +20,7 @@ defmodule GuatemalaWeb.FormNewCustomersComponent do
 
   def render(assigns) do
     ~H"""
-      <div id="form_new_edit_customer" class="bg-amber-100 dark:bg-slate-800 mt-16 ml-1 w-full rounded float-left">
+      <div id="form_new_customer" class="bg-amber-100 dark:bg-slate-800 mt-16 ml-1 w-full rounded float-left">
 
 
           <div class="w-full py-2 bg-amber-700 dark:bg-slate-800">
@@ -29,7 +29,7 @@ defmodule GuatemalaWeb.FormNewCustomersComponent do
 
           <div class="h-hoch-80 px-4 w-full relative mt-2">
 
-            <form id="form_customer" phx-submit="save_customer" phx-target="#form_new_edit_customer">
+            <form id="form_customer" phx-submit="save_customer" phx-target="#form_new_customer">
               <div class="border-solid border-2 border-amber-700 px-4 py-1 rounded">
                 <div>
                   <label class="text-base font-bold text-amber-700 dark:text-white">Rellene los campos necesarios</label>

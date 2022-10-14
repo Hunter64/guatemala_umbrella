@@ -107,4 +107,9 @@ defmodule Guatemala.Emails do
       |> Enum.filter(fn x -> x.owner_id == owner_id and x.active end)
       |> List.first()
   end
+
+  def get_list_emails_owner_id(owner_id) do
+    list_emails()
+      |> Enum.filter(fn x -> x.owner_id == owner_id end)
+  end
 end

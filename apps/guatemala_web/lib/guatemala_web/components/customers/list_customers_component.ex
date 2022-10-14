@@ -12,12 +12,13 @@ defmodule GuatemalaWeb.ListCustomersComponent do
     {:ok, socket}
   end
 
-  def update(attrs, socket) do
+  def update(_attrs, socket) do
     # {:ok, socket}
     {:ok, assign(socket,
       new: false,
       edit: false,
       list: true,
+      customer_id_edit: 0,
       all_customers: Customers.list_customers()
         |> add_email_and_phone()
         |> IO.inspect(label: " ---------------> LIST CUSTOMERS ")
@@ -98,7 +99,7 @@ defmodule GuatemalaWeb.ListCustomersComponent do
                               </td>
                               <td class="p-2 whitespace-nowrap w-10/100">
                                   <div class="font-medium">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 align-center">
+                                    <svg phx-click="edit_customer" phx-target="#list_customers" phx-value-customer_id={item.id} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 align-center cursor-pointer hover:bg-blue-200 hover:rounded">
                                       <path d="M18.75 12.75h1.5a.75.75 0 000-1.5h-1.5a.75.75 0 000 1.5zM12 6a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 0112 6zM12 18a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 0112 18zM3.75 6.75h1.5a.75.75 0 100-1.5h-1.5a.75.75 0 000 1.5zM5.25 18.75h-1.5a.75.75 0 010-1.5h1.5a.75.75 0 010 1.5zM3 12a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 013 12zM9 3.75a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5zM12.75 12a2.25 2.25 0 114.5 0 2.25 2.25 0 01-4.5 0zM9 15.75a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z" />
                                     </svg>
                                   </div>
@@ -116,6 +117,12 @@ defmodule GuatemalaWeb.ListCustomersComponent do
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="w-full">
+
+          <%= if @edit, do: live_component(GuatemalaWeb.FormEditCustomersComponent, id: @customer_id_edit, new: false, edit: true, list: false) %>
+
         </div>
 
       </div>
@@ -160,6 +167,22 @@ defmodule GuatemalaWeb.ListCustomersComponent do
   def get_phone(phone_data) do
     "(" <> phone_data.lada_code <> ")" <> phone_data.number |> IO.inspect(label: " -------------------> NUMBER")
       # |> Map.get(:number)
+  end
+
+  def handle_event("edit_customer", params, socket) do
+    # params |> IO.inspect(label: " -------> HERE ")
+
+    # params["customer_id"] |> Guatemala.Customers.get_customer!() |> IO.inspect(label: " -----------------> CUSTOMER")
+
+    # {:noreply, socket}
+
+    {:noreply, assign(
+      socket,
+      new: false,
+      edit: true,
+      customer_id_edit: params["customer_id"]
+      )}
+
   end
 
 end

@@ -108,4 +108,9 @@ defmodule Guatemala.Phones do
       |> List.first()
   end
 
+  def get_list_phones_owner_id(owner_id) do
+    list_phones()
+      |> Enum.filter(fn x -> x.owner_id == owner_id end)
+  end
+
 end
