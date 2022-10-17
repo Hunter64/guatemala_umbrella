@@ -16,7 +16,8 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
   def update(attrs, socket) do
     attrs |> IO.inspect(label: " --------> ATTRS EDIT")
     {:ok, assign(socket,
-      customer: attrs.id |> get_customer_data()
+      customer: attrs.id |> get_customer_data(),
+      add_new_email: false
     )}
   end
 
@@ -106,14 +107,29 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
                   <label class="text-base font-normal text-amber-700 dark:text-white">Email:</label>
                 </div>
 
-                <div class="w-25/100 py-2">
-                  <%= for item <- @customer.emails do %>
-                    <label> <%= item.email %> </label>
-                  <% end %>
+                <div class="w-27/100 py-2">
+                  <select phx-hook="select_email_for_customer" id="emails_list" name="email_selected" class="w-full py-1 rounded">
+                    <%= for item <- @customer.emails do %>
+
+                      <%= if item.id == @customer.email_active.id do %>
+                        <option value={ item.id } selected >
+                         <%= item.email %>
+                        </option>
+                        <% else %>
+                        <option value={ item.id } >
+                         <%= item.email %>
+                        </option>
+                      <% end %>
+
+                    <% end %>
+                  </select>
                 </div>
 
-                <div class="w-5/100 py-2" phx-click="edit_emails" phx-target="#form_edit_customer" phx-value-customer_id={@customer.id}>
-                  Add
+                <div class="w-3/100 py-2 px-2 tooltip" phx-click="edit_emails" phx-target="#form_edit_customer" phx-value-customer_id={@customer.id}>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 9a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V15a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V9z" clip-rule="evenodd" class="text-green-500 cursor-pointer"/>
+                  </svg>
+                  <span class="text-xs absolute tooltip-text text-white bg-lime-500 dark:bg-slate-800 rounded">Agregar Nuevo</span>
                 </div>
               </div>
 
@@ -126,7 +142,9 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
                 </div>
 
                 <div class="w-45/100 py-2">
-                  <input type="text" name="new_email" maxlength="128" class="shadow w-full px-2 py-1 border-amber-100 focus:border-amber-500 text-sm appearance-none block text-gray-700 border rounded leading-tight focus:outline-none focus:bg-white" phx-value-name="new_email" id="input_new_email" placeholder="Agregar Nuevo Email" value="">
+                  <%= if @add_new_email do %>
+                    <input type="text" name="new_email" maxlength="128" class="cursor-pointer shadow w-full px-2 py-1 border-amber-100 focus:border-amber-500 text-sm appearance-none block text-gray-700 border rounded leading-tight focus:outline-none focus:bg-white" phx-value-name="new_email" id="input_new_email" placeholder="Agregar Nuevo Email" value="">
+                  <% end %>
                 </div>
               </div>
 
@@ -161,6 +179,8 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
   def handle_event("edit_phones", params, socket) do
     params |> IO.inspect(label: " -------> Edit phones ")
 
+
+
     # params["customer_id"] |> Guatemala.Customers.get_customer!() |> IO.inspect(label: " -----------------> CUSTOMER")
 
     {:noreply, socket}
@@ -176,10 +196,15 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
 
   def handle_event("edit_emails", params, socket) do
     params |> IO.inspect(label: " -------> Edit emails ")
-
+    socket.assigns.add_new_email |> IO.inspect(label: " -----------> socket.assigns.add_new_email")
     # params["customer_id"] |> Guatemala.Customers.get_customer!() |> IO.inspect(label: " -----------------> CUSTOMER")
 
-    {:noreply, socket}
+    # {:noreply, socket}
+
+    {:noreply, assign(
+      socket,
+      add_new_email: !socket.assigns.add_new_email
+    )}
 
     # {:noreply, assign(
     #   socket,
