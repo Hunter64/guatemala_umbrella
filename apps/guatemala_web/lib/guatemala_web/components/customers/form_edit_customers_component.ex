@@ -17,7 +17,8 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
     attrs |> IO.inspect(label: " --------> ATTRS EDIT")
     {:ok, assign(socket,
       customer: attrs.id |> get_customer_data(),
-      add_new_email: false
+      add_new_email: false,
+      add_new_phone: false
     )}
   end
 
@@ -41,6 +42,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
               <div>
                 <input type="hidden" name="customer_id" value={@customer.id}>
                 <input type="hidden" name="email_active_id" value={@customer.email_active.id}>
+                <input type="hidden" name="phone_active_id" value={@customer.phone_active.id}>
               </div>
 
               <div class="w-full inline-flex">
@@ -90,14 +92,33 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
                   <label class="text-base font-normal text-amber-700 dark:text-white">Teléfono:</label>
                 </div>
 
-                <div class="w-25/100 py-2">
+                <div class="w-27/100 py-2">
+                  <select phx-hook="select_phone_for_customer" id="phones_list" name="phone_selected" class="w-full py-1 rounded">
                     <%= for item <- @customer.phones do %>
-                      <label> <%= item.number %> </label>
+
+                      <%= if item.id == @customer.phone_active.id do %>
+                        <option value={ item.id } selected >
+                         <%= item.number %>
+                        </option>
+                        <% else %>
+                        <option value={ item.id } >
+                         <%= item.number %>
+                        </option>
+                      <% end %>
+
                     <% end %>
+                  </select>
                 </div>
 
-                <div class="w-5/100 py-2" phx-click="edit_phones" phx-target="#form_edit_customer" phx-value-customer_id={@customer.id}>
-                  Add
+                <div class="w-3/100 py-2 px-2 tooltip" phx-click="edit_phones" phx-target="#form_edit_customer">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 9a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V15a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V9z" clip-rule="evenodd" class="text-green-500 cursor-pointer"/>
+                  </svg>
+                  <%= if @add_new_phone do %>
+                    <span class="text-xs absolute tooltip-text text-white bg-lime-500 dark:bg-slate-800 rounded">Ocultar</span>
+                  <% else %>
+                    <span class="text-xs absolute tooltip-text text-white bg-lime-500 dark:bg-slate-800 rounded">Agregar Nuevo</span>
+                  <% end %>
                 </div>
 
                 <div class="w-10/100 py-2">
@@ -125,7 +146,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
                   </select>
                 </div>
 
-                <div class="w-3/100 py-2 px-2 tooltip" phx-click="edit_emails" phx-target="#form_edit_customer" phx-value-customer_id={@customer.id}>
+                <div class="w-3/100 py-2 px-2 tooltip" phx-click="edit_emails" phx-target="#form_edit_customer">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
                     <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 9a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V15a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V9z" clip-rule="evenodd" class="text-green-500 cursor-pointer"/>
                   </svg>
@@ -139,7 +160,9 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
 
               <div class="w-full inline-flex">
                 <div class="w-45/100 py-2">
-                  TO PHONE
+                  <%= if @add_new_phone do %>
+                    <input type="text" name="new_phone" maxlength="128" class="cursor-pointer shadow w-full px-2 py-1 border-amber-100 focus:border-amber-500 text-sm appearance-none block text-gray-700 border rounded leading-tight focus:outline-none focus:bg-white" phx-value-name="new_phone" id="input_new_phone" placeholder="Agregar Nuevo Teléfono" value="">
+                  <% end %>
                 </div>
 
                 <div class="w-10/100 py-2">
@@ -180,22 +203,11 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
     """
   end
 
-  def handle_event("edit_phones", params, socket) do
-    params |> IO.inspect(label: " -------> Edit phones ")
-
-
-
-    # params["customer_id"] |> Guatemala.Customers.get_customer!() |> IO.inspect(label: " -----------------> CUSTOMER")
-
-    {:noreply, socket}
-
-    # {:noreply, assign(
-    #   socket,
-    #   new: false,
-    #   edit: true,
-    #   customer_id_edit: params["customer_id"]
-    #   )}
-
+  def handle_event("edit_phones", _params, socket) do
+    {:noreply, assign(
+      socket,
+      add_new_phone: !socket.assigns.add_new_phone
+    )}
   end
 
   def handle_event("edit_emails", params, socket) do
@@ -222,6 +234,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
   def handle_event("save_edit_customer", params, socket) do
     params |> IO.inspect(label: " ----------------> PARAMS EDIT CUSTOMER")
     params["new_email"] |> create_new_email(params)
+    params["new_phone"] |> create_new_phone(params)
     # params["email_active_id"] |> Guatemala.Emails.get_email!() |> Guatemala.Emails.update_email(%{active: false}) |> IO.inspect(label: " -----------> EDIT PREVIOUS EMAIL")
     {:noreply, socket}
   end
@@ -247,11 +260,12 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
       |> Map.put(:phones, phone_data)
       |> Map.put(:emails, email_data)
       |> Map.put(:email_active, customer.id |> Guatemala.Emails.get_first_active_email_owner_id())
+      |> Map.put(:phone_active, customer.id |> Guatemala.Phones.get_first_active_phone_owner_id())
       |> IO.inspect(label: " --------------------> ALL CUSTOMERS ")
   end
 
   def create_new_email("", _params) do
-    IO.puts("NOTHING")
+    IO.puts("NOTHING EMAIL")
   end
 
   def create_new_email(new_email, params) do
@@ -268,6 +282,33 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
         ->
           email |> IO.inspect(label: " --------------------> NEW EMAIL FOR CUSTOMER")
           params["email_active_id"] |> Guatemala.Emails.get_email!() |> Guatemala.Emails.update_email(%{active: false}) |> IO.inspect(label: " -----------> EDIT PREVIOUS EMAIL")
+      {:error, %Ecto.Changeset{} = changeset}
+        ->
+          "Error" <> EctoUtil.get_errors(changeset) |> IO.inspect(label: " ------------------> ERROR")
+    end
+  end
+
+  def create_new_phone("", _params) do
+    IO.puts("NOTHING PHONE")
+  end
+
+  def create_new_phone(new_phone, params) do
+    %{
+      active: true,
+      catalog_id: 1,
+      country_code: "+52",
+      creator_user_id: 1,
+      extension: "",
+      lada_code: "55",
+      number: new_phone,
+      owner_id: params["customer_id"]
+    }
+    |> Guatemala.Phones.create_phone()
+    |> case do
+      {:ok, phone}
+        ->
+          phone |> IO.inspect(label: " --------------------> NEW Phone FOR CUSTOMER")
+          params["phone_active_id"] |> Guatemala.Phones.get_phone!() |> Guatemala.Phones.update_phone(%{active: false}) |> IO.inspect(label: " -----------> EDIT PREVIOUS Phone")
       {:error, %Ecto.Changeset{} = changeset}
         ->
           "Error" <> EctoUtil.get_errors(changeset) |> IO.inspect(label: " ------------------> ERROR")
