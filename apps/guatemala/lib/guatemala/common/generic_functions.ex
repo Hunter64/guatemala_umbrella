@@ -923,4 +923,30 @@ defmodule Guatemala.GenericFunctions do
   #     |> Guatemala.Crossbones.quote_opportunity()
   # end
 
+
+  @doc """
+  Return list with filters applied, this need a list, atom in list for search and param's value to filter
+
+  ## Examples
+    list = [
+      %{active: false, id: 1, name: "Juan"},
+      %{active: true, id: 2, name: "Antonio"},
+      %{active: false, id: 3, name: "Pablo"},
+      %{active: true, id: 4, name: "Daniel"},
+      %{active: false, id: 5, name: "Juan"}
+    ]
+    iex> Guatemala.GenericFunctions.apply_filter(list, :name, "Juan")
+      [%{active: false, id: 1, name: "Juan"}, %{active: false, id: 5, name: "Juan"}]
+
+    iex> Guatemala.GenericFunctions.apply_filter(list, :name, "Victor")
+      []
+
+    iex> Guatemala.GenericFunctions.apply_filter(list, :name, nil)
+      []
+
+  """
+  def apply_filter(list, atom, value) do
+    list |> Enum.filter(fn x -> x |> Map.get(atom) == value end)
+  end
+
 end

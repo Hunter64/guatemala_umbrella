@@ -12,16 +12,18 @@ defmodule GuatemalaWeb.ListCustomersComponent do
     {:ok, socket}
   end
 
-  def update(_attrs, socket) do
+  def update(attrs, socket) do
+    attrs |> IO.inspect(label: " -----------------> ATTRS - TO LIST IN The EDIT COMPONENT ------------------------------->>>>>>>>>>>>>>")
     # {:ok, socket}
     {:ok, assign(socket,
       new: false,
       edit: false,
       list: true,
       customer_id_edit: 0,
-      all_customers: Customers.list_customers()
+      all_customers: Customers.list_customers() |> IO.inspect(label: "----------------------------------------------->> ALL ")
+        |> apply_all_filters(attrs.filters)
         |> add_email_and_phone()
-        |> IO.inspect(label: " ---------------> LIST CUSTOMERS ")
+
     )}
 
   end
@@ -167,6 +169,36 @@ defmodule GuatemalaWeb.ListCustomersComponent do
   def get_phone(phone_data) do
     "(" <> phone_data.lada_code <> ")" <> phone_data.number |> IO.inspect(label: " -------------------> NUMBER")
       # |> Map.get(:number)
+  end
+
+  def apply_all_filters(list_customers, params) do
+    params["clave"]
+      |> filter_clave(list_customers)
+      |> filter_nombre_largo(params["large_name"])
+  end
+
+  def filter_clave(nil, list) do
+    list
+  end
+
+  def filter_clave("", list) do
+    list
+  end
+
+  def filter_clave(param, list) do
+    list |> Enum.filter(fn x -> x.id == (param |> String.to_integer) end)
+  end
+
+  def filter_nombre_largo(list, nil) do
+    list
+  end
+
+  def filter_nombre_largo(list, "") do
+    list
+  end
+
+  def filter_nombre_largo(list, param) do
+    list |> Enum.filter(fn x -> String.contains?(Guatemala.GenericFunctions.downcase(x.large_name), Guatemala.GenericFunctions.downcase(param)) end)
   end
 
   def handle_event("edit_customer", params, socket) do
