@@ -13,7 +13,7 @@ defmodule GuatemalaWeb.ListCustomersComponent do
   end
 
   def update(attrs, socket) do
-    attrs |> IO.inspect(label: " -----------------> ATTRS - TO LIST IN The EDIT COMPONENT ------------------------------->>>>>>>>>>>>>>")
+    attrs |> IO.inspect(label: " -----------------> ATTRS - TRY TRY ------------------------------->>>>>>>>>>>>>>")
     # {:ok, socket}
     {:ok, assign(socket,
       new: false,
