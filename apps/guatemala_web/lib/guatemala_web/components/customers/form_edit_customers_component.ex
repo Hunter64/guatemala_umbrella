@@ -14,7 +14,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
   end
 
   def update(attrs, socket) do
-    attrs |> IO.inspect(label: " --------> ATTRS EDIT")
+    attrs |> IO.inspect(label: " --------> ATTRS EDIT--------------------------->")
     {:ok, assign(socket,
       customer: attrs.id |> get_customer_data(),
       add_new_email: false,
