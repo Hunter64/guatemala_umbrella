@@ -18,7 +18,9 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
     {:ok, assign(socket,
       customer: attrs.id |> get_customer_data(),
       add_new_email: false,
-      add_new_phone: false
+      add_new_phone: false,
+      form_valid: init_fill_form(),
+      form: fill_form()
     )}
   end
 
@@ -31,7 +33,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
       </div>
 
       <div class="h-hoch-80 px-4 w-full relative mt-2">
-        <form id="form_to_edit_customer" phx-submit="save_edit_customer" phx-target="#form_edit_customer">
+        <form id="form_to_edit_customer" phx-submit="save_edit_customer" phx-change="update_form" phx-target="#form_edit_customer">
           <div class="border-solid border-2 border-amber-700 px-4 py-1 rounded">
             <div>
               <label class="text-base font-bold text-amber-700 dark:text-white">Rellene los campos necesarios</label>
@@ -47,11 +49,12 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
 
               <div class="w-full inline-flex">
                 <div class="w-15/100 py-2">
-                  <label class="text-base font-normal text-amber-700 dark:text-white">Primer Nombre:</label>
+                  <label class="text-base font-normal text-amber-700 dark:text-white">Primer Nombre*:</label>
                 </div>
 
                 <div class="w-30/100 py-2">
                   <input type="text" name="first_name" maxlength="128" class="shadow w-full px-2 py-1 border-amber-100 focus:border-amber-500 text-sm appearance-none block text-gray-700 border rounded leading-tight focus:outline-none focus:bg-white" phx-value-name="first_name" phx-target="#form_customers" id="input_first_name" placeholder="Primer Nombre" value={@customer.first_name}>
+                  <div class="text-red-700 text-xs font-medium"><%= @form_valid.first_name.message %></div>
                 </div>
 
                 <div class="w-10/100 py-2">
@@ -68,11 +71,12 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
 
               <div class="w-full inline-flex">
                 <div class="w-15/100 py-2">
-                  <label class="text-base font-normal text-amber-700 dark:text-white">Primer Apellido:</label>
+                  <label class="text-base font-normal text-amber-700 dark:text-white">Primer Apellido*:</label>
                 </div>
 
                 <div class="w-30/100 py-2">
                   <input type="text" name="first_surname" maxlength="128" class="shadow w-full px-2 py-1 border-amber-100 focus:border-amber-500 text-sm appearance-none block text-gray-700 border rounded leading-tight focus:outline-none focus:bg-white" phx-value-name="first_surname" phx-target="#form_customers" id="input_first_surname" placeholder="Primer Apellido" value={@customer.first_surname}>
+                  <div class="text-red-700 text-xs font-medium"><%= @form_valid.first_surname.message %></div>
                 </div>
 
                 <div class="w-10/100 py-2">
@@ -177,6 +181,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
                 <div class="w-45/100 py-2">
                   <%= if @add_new_email do %>
                     <input type="text" name="new_email" maxlength="128" class="cursor-pointer shadow w-full px-2 py-1 border-amber-100 focus:border-amber-500 text-sm appearance-none block text-gray-700 border rounded leading-tight focus:outline-none focus:bg-white" phx-value-name="new_email" id="input_new_email" placeholder="Agregar Nuevo Email" value="">
+                    <div class="text-red-700 text-xs font-medium"><%= @form_valid.new_email.message %></div>
                   <% end %>
                 </div>
               </div>
@@ -237,6 +242,21 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
 
   end
 
+  def handle_event("update_form", params, socket) do
+    target_to_edit = params["_target"] |> List.first()
+    update_target = params |> Map.get(target_to_edit)
+
+    form_valid =
+      socket.assigns.form_valid
+        |> Generic.validate_form(target_to_edit, update_target)
+
+    {:noreply, assign(
+      socket,
+      form: socket.assigns.form |> update_form(target_to_edit, update_target),
+      form_valid: form_valid
+      )}
+  end
+
   def handle_event("save_edit_customer", params, socket) do
     params |> IO.inspect(label: " ----------------> PARAMS EDIT CUSTOMER")
     params["new_email"] |> create_new_email(params)
@@ -270,6 +290,10 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
       |> IO.inspect(label: " --------------------> ALL CUSTOMERS ")
   end
 
+  def create_new_email(nil, _params) do
+    IO.puts("NOTHING EMAIL")
+  end
+
   def create_new_email("", _params) do
     IO.puts("NOTHING EMAIL")
   end
@@ -290,8 +314,12 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
           params["email_active_id"] |> Guatemala.Emails.get_email!() |> Guatemala.Emails.update_email(%{active: false}) |> IO.inspect(label: " -----------> EDIT PREVIOUS EMAIL")
       {:error, %Ecto.Changeset{} = changeset}
         ->
-          "Error" <> EctoUtil.get_errors(changeset) |> IO.inspect(label: " ------------------> ERROR")
+          "Error " <> EctoUtil.get_errors(changeset) |> IO.inspect(label: " ------------------> ERROR")
     end
+  end
+
+  def create_new_phone(nil, _params) do
+    IO.puts("NOTHING PHONE")
   end
 
   def create_new_phone("", _params) do
@@ -319,6 +347,94 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
         ->
           "Error" <> EctoUtil.get_errors(changeset) |> IO.inspect(label: " ------------------> ERROR")
     end
+  end
+
+  defp init_fill_form() do
+    Map.new
+      |> Map.put(:customer_id, %{
+          valid: true,
+          required: [],
+          message: ""
+        })
+      |> Map.put(:email_active_id, %{
+          valid: true,
+          required: [],
+          message: ""
+        })
+      |> Map.put(:phone_active_id, %{
+          valid: true,
+          required: [],
+          message: ""
+        })
+      |> Map.put(:first_name, %{
+          valid: true,
+          required: [
+            %{
+              func: &Generic.required/1, message: "El valor es requerido"
+            }
+          ],
+          message: ""
+        })
+      |> Map.put(:second_name, %{
+          valid: true,
+          required: [],
+          message: ""
+        })
+      |> Map.put(:first_surname, %{
+          valid: true,
+          required: [
+            %{
+              func: &Generic.required/1, message: "El valor es requerido"
+            }
+          ],
+          message: ""
+        })
+      |> Map.put(:second_surname, %{
+          valid: true,
+          required: [],
+          message: ""
+        })
+      |> Map.put(:email_selected, %{
+          valid: true,
+          required: [],
+          message: ""
+        })
+      |> Map.put(:phone_selected, %{
+          valid: true,
+          required: [],
+          message: ""
+        })
+      |> Map.put(:comments, %{
+          valid: true,
+          required: [],
+          message: ""
+        })
+      |> Map.put(:new_email, %{
+          valid: true,
+          required: [
+            %{
+              func: &Generic.email/1, message: "Formato no válido"
+            }
+          ],
+          message: ""
+        })
+  end
+
+  defp fill_form() do
+    Map.new
+      |> Map.put(:first_name, "")
+      |> Map.put(:second_name, "")
+      |> Map.put(:first_surname, "")
+      |> Map.put(:second_surname,  "")
+      |> Map.put(:email_selected,  "")
+      |> Map.put(:phone_selected,  "")
+      |> Map.put(:comments, "")
+      |> Map.put(:new_email, "")
+  end
+
+  defp update_form(form, target, update, _aux \\ "") do
+    form
+      |> Map.put(target |> String.to_atom(), update)
   end
 
 end
