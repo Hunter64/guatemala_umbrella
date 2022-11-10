@@ -682,7 +682,7 @@ defmodule Guatemala.GenericFunctions do
       false
 
   """
-  def length_10(value), do: value |> String.length() >= 10
+  def length_10(value), do: value |> String.length() == 10
 
   @doc """
   returns a boolean from validate string is number with regular expression
@@ -708,10 +708,10 @@ defmodule Guatemala.GenericFunctions do
       false
 
   """
-  # def lada(tel) do
-  #   tel
-  #     |> String.starts_with?(arr__lada())
-  # end
+  def lada(tel) do
+    tel
+      |> String.starts_with?(arr_lada())
+  end
 
   @doc """
   returns rules from validation in catalogue form
@@ -792,21 +792,26 @@ defmodule Guatemala.GenericFunctions do
 
   @doc """
   returns format phone numbers string from a phone number format
+
+  #Examples
+    iex> Guatemala.GenericFunctions.format_phone("5527220409")
+      "(55) 2722-0409"
+
   """
-  # def format_phone(phone) do
-  #   if String.length(phone) == 10 do
-  #     contain = phone
-  #       |> String.slice(0..1)
-  #       |> String.contains?(ladas_cortas())
-  #     if contain do
-  #       "(#{String.slice(phone, 0..1)}) #{String.slice(phone, 2..5)}-#{String.slice(phone, 6..9)}"
-  #     else
-  #       "(#{String.slice(phone, 0..2)}) #{String.slice(phone, 3..5)}-#{String.slice(phone, 6..9)}"
-  #     end
-  #   else
-  #     phone
-  #   end
-  # end
+  def format_phone(phone) do
+    if String.length(phone) == 10 do
+      contain = phone
+        |> String.slice(0..1)
+        |> String.contains?(ladas_cortas())
+      if contain do
+        "(#{String.slice(phone, 0..1)}) #{String.slice(phone, 2..5)}-#{String.slice(phone, 6..9)}"
+      else
+        "(#{String.slice(phone, 0..2)}) #{String.slice(phone, 3..5)}-#{String.slice(phone, 6..9)}"
+      end
+    else
+      phone
+    end
+  end
 
   def map_to_uppercase(map) do
     map
@@ -901,16 +906,417 @@ defmodule Guatemala.GenericFunctions do
   defp any_to_atom(string) when is_atom(string), do: string
   defp any_to_atom(_), do: :not_string_or_atom
 
-  # defp ladas_cortas() do
-  #   Guatemala.Ladas.list_ladas
-  #     |> Enum.filter(fn x -> x.type == @lada_corta end)
-  #     |> Enum.map(fn x -> x.lada end)
-  # end
+  def ladas_cortas() do
+    [
+      "33",
+      "55",
+      "56",
+      "81"
+    ]
+  end
 
-  # defp arr__lada() do
-  #   Guatemala.Ladas.list_ladas
-  #     |> Enum.map(fn x -> x.lada end)
-  # end
+  defp arr_lada() do
+    [
+      "33",
+      "56",
+      "55",
+      "81",
+      "222",
+      "223",
+      "224",
+      "225",
+      "226",
+      "227",
+      "228",
+      "229",
+      "231",
+      "232",
+      "233",
+      "235",
+      "236",
+      "237",
+      "238",
+      "241",
+      "243",
+      "244",
+      "245",
+      "246",
+      "247",
+      "248",
+      "249",
+      "271",
+      "272",
+      "273",
+      "274",
+      "275",
+      "276",
+      "278",
+      "279",
+      "281",
+      "282",
+      "283",
+      "284",
+      "285",
+      "287",
+      "288",
+      "294",
+      "296",
+      "297",
+      "311",
+      "312",
+      "313",
+      "314",
+      "315",
+      "316",
+      "317",
+      "319",
+      "321",
+      "322",
+      "323",
+      "324",
+      "325",
+      "326",
+      "327",
+      "328",
+      "329",
+      "341",
+      "342",
+      "343",
+      "344",
+      "345",
+      "346",
+      "347",
+      "348",
+      "349",
+      "351",
+      "352",
+      "353",
+      "354",
+      "355",
+      "356",
+      "357",
+      "358",
+      "359",
+      "371",
+      "372",
+      "373",
+      "374",
+      "375",
+      "376",
+      "377",
+      "378",
+      "381",
+      "382",
+      "383",
+      "384",
+      "385",
+      "386",
+      "387",
+      "388",
+      "389",
+      "391",
+      "392",
+      "393",
+      "394",
+      "395",
+      "411",
+      "412",
+      "413",
+      "414",
+      "415",
+      "417",
+      "418",
+      "419",
+      "421",
+      "422",
+      "423",
+      "424",
+      "425",
+      "426",
+      "427",
+      "428",
+      "429",
+      "431",
+      "432",
+      "433",
+      "434",
+      "435",
+      "436",
+      "437",
+      "438",
+      "441",
+      "442",
+      "443",
+      "444",
+      "445",
+      "447",
+      "448",
+      "449",
+      "451",
+      "452",
+      "453",
+      "454",
+      "455",
+      "456",
+      "457",
+      "458",
+      "459",
+      "461",
+      "462",
+      "463",
+      "464",
+      "465",
+      "466",
+      "467",
+      "468",
+      "469",
+      "471",
+      "472",
+      "473",
+      "474",
+      "475",
+      "476",
+      "477",
+      "478",
+      "481",
+      "482",
+      "483",
+      "485",
+      "486",
+      "487",
+      "488",
+      "489",
+      "492",
+      "493",
+      "494",
+      "495",
+      "496",
+      "498",
+      "499",
+      "588",
+      "591",
+      "592",
+      "593",
+      "594",
+      "595",
+      "596",
+      "597",
+      "599",
+      "612",
+      "613",
+      "614",
+      "615",
+      "616",
+      "618",
+      "621",
+      "622",
+      "623",
+      "624",
+      "625",
+      "626",
+      "627",
+      "628",
+      "629",
+      "631",
+      "632",
+      "633",
+      "634",
+      "635",
+      "636",
+      "637",
+      "638",
+      "639",
+      "641",
+      "642",
+      "643",
+      "644",
+      "645",
+      "646",
+      "647",
+      "648",
+      "649",
+      "651",
+      "652",
+      "653",
+      "656",
+      "658",
+      "659",
+      "661",
+      "662",
+      "664",
+      "665",
+      "667",
+      "668",
+      "669",
+      "671",
+      "672",
+      "673",
+      "674",
+      "675",
+      "676",
+      "677",
+      "686",
+      "687",
+      "694",
+      "695",
+      "696",
+      "697",
+      "698",
+      "711",
+      "712",
+      "713",
+      "714",
+      "715",
+      "716",
+      "717",
+      "718",
+      "719",
+      "721",
+      "722",
+      "723",
+      "724",
+      "725",
+      "726",
+      "727",
+      "728",
+      "731",
+      "732",
+      "733",
+      "734",
+      "735",
+      "736",
+      "737",
+      "738",
+      "739",
+      "741",
+      "742",
+      "743",
+      "744",
+      "745",
+      "746",
+      "747",
+      "748",
+      "749",
+      "751",
+      "753",
+      "754",
+      "755",
+      "756",
+      "757",
+      "758",
+      "759",
+      "761",
+      "762",
+      "763",
+      "764",
+      "765",
+      "766",
+      "767",
+      "768",
+      "769",
+      "771",
+      "772",
+      "773",
+      "774",
+      "775",
+      "776",
+      "777",
+      "778",
+      "779",
+      "781",
+      "782",
+      "783",
+      "784",
+      "785",
+      "786",
+      "789",
+      "791",
+      "797",
+      "821",
+      "823",
+      "824",
+      "825",
+      "826",
+      "828",
+      "829",
+      "831",
+      "832",
+      "833",
+      "834",
+      "835",
+      "836",
+      "841",
+      "842",
+      "844",
+      "845",
+      "846",
+      "861",
+      "862",
+      "864",
+      "866",
+      "867",
+      "868",
+      "869",
+      "871",
+      "872",
+      "873",
+      "877",
+      "878",
+      "891",
+      "892",
+      "894",
+      "897",
+      "899",
+      "913",
+      "914",
+      "916",
+      "917",
+      "918",
+      "919",
+      "921",
+      "922",
+      "923",
+      "924",
+      "932",
+      "933",
+      "934",
+      "936",
+      "937",
+      "938",
+      "951",
+      "953",
+      "954",
+      "958",
+      "961",
+      "962",
+      "963",
+      "964",
+      "965",
+      "966",
+      "967",
+      "968",
+      "969",
+      "971",
+      "972",
+      "981",
+      "982",
+      "983",
+      "985",
+      "986",
+      "988",
+      "991",
+      "992",
+      "993",
+      "994",
+      "995",
+      "996",
+      "997",
+      "998",
+      "999",
+      "984",
+      "987"
+    ]
+  end
 
   # def insert_snet_list_quotes_opportunities([]) do
   #   []
@@ -947,6 +1353,23 @@ defmodule Guatemala.GenericFunctions do
   """
   def apply_filter(list, atom, value) do
     list |> Enum.filter(fn x -> x |> Map.get(atom) == value end)
+  end
+
+  def get_data_phone_number(phone) do
+    phone
+      |> String.starts_with?(ladas_cortas())
+      |> case do
+        true ->
+          %{
+            lada: phone |> String.slice(0..1),
+            number: phone |> String.slice(2..9)
+          }
+        false ->
+          %{
+            lada: phone |> String.slice(0..2),
+            number: phone |> String.slice(3..9)
+          }
+      end
   end
 
 end
