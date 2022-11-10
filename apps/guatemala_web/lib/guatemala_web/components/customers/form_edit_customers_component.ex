@@ -9,6 +9,9 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
   alias Guatemala.Customers, as: Customers
   alias Guatemala.EctoUtil, as: EctoUtil
 
+  @success_message 1
+  @error_message 2
+
   def mount(socket) do
     {:ok, socket}
   end
@@ -97,16 +100,16 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
                 </div>
 
                 <div class="w-27/100 py-2">
-                  <select phx-hook="select_phone_for_customer" id="phones_list" name="phone_selected" class="w-full py-1 rounded">
+                  <select id="phones_list" name="phone_selected" class="w-full py-1 rounded">
                     <%= for item <- @customer.phones do %>
 
                       <%= if item.id == @customer.phone_active.id do %>
                         <option value={ item.id } selected >
-                         <%= item.number %>
+                         <%= item.lada_code <> item.number |> Generic.format_phone %>
                         </option>
                         <% else %>
                         <option value={ item.id } >
-                         <%= item.number %>
+                         <%= item.lada_code <> item.number |> Generic.format_phone %>
                         </option>
                       <% end %>
 
@@ -136,7 +139,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
                 </div>
 
                 <div class="w-27/100 py-2">
-                  <select phx-hook="select_email_for_customer" id="emails_list" name="email_selected" class="w-full py-1 rounded">
+                  <select id="emails_list" name="email_selected" class="w-full py-1 rounded">
                     <%= for item <- @customer.emails do %>
 
                       <%= if item.id == @customer.email_active.id do %>
@@ -171,7 +174,8 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
               <div class="w-full inline-flex">
                 <div class="w-45/100 py-2">
                   <%= if @add_new_phone do %>
-                    <input type="text" name="new_phone" maxlength="128" class="cursor-pointer shadow w-full px-2 py-1 border-amber-100 focus:border-amber-500 text-sm appearance-none block text-gray-700 border rounded leading-tight focus:outline-none focus:bg-white" phx-value-name="new_phone" id="input_new_phone" placeholder="Agregar Nuevo Teléfono" value="">
+                    <input type="text" name="new_phone" maxlength="100" class="cursor-pointer shadow w-full px-2 py-1 border-amber-100 focus:border-amber-500 text-sm appearance-none block text-gray-700 border rounded leading-tight focus:outline-none focus:bg-white" phx-value-name="new_phone" id="input_new_phone" placeholder="Agregar Nuevo Teléfono" value="">
+                    <div class="text-red-700 text-xs font-medium"><%= @form_valid.new_phone.message %></div>
                   <% end %>
                 </div>
 
@@ -250,6 +254,18 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
       socket.assigns.form_valid
         |> Generic.validate_form(target_to_edit, update_target)
 
+        target_to_edit |> IO.inspect(label: "------------------------->>>>>>>>>>>>> Target to edit")
+
+    update_target = case target_to_edit == "new_phone" do
+      true ->
+        update_target
+          |> String.replace("(", "")
+          |> String.replace(" ", "")
+          |> String.replace(")", "")
+          |> String.replace("-", "")
+      false -> update_target
+    end
+
     {:noreply, assign(
       socket,
       form: socket.assigns.form |> update_form(target_to_edit, update_target),
@@ -262,7 +278,38 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
     params["new_email"] |> create_new_email(params)
     params["new_phone"] |> create_new_phone(params)
     # params["email_active_id"] |> Guatemala.Emails.get_email!() |> Guatemala.Emails.update_email(%{active: false}) |> IO.inspect(label: " -----------> EDIT PREVIOUS EMAIL")
+    params |> update_customer()
+
     {:noreply, socket}
+  end
+
+  def update_customer(params) do
+    customer = %{
+      first_name: params["first_name"],
+      second_name: params["second_name"],
+      first_surname: params["first_surname"],
+      second_surname: params["second_surname"],
+      comments: params["comments"]
+    }
+    params["customer_id"] |> String.to_integer |> Customers.get_customer!()
+      |> Customers.update_customer(customer)
+      |> case do
+        {:ok, customer}
+          -> send_message_notification(@success_message, "Éxito", "Cliente " <> customer.large_name <> " actualizado correctamente")
+        {:error, %Ecto.Changeset{} = changeset}
+          -> send_message_notification(@error_message, "Error", "Error al intentar actualizar el cliente " <> EctoUtil.get_errors(changeset))
+      end
+  end
+
+  def send_message_notification(message_type, header, msg) do
+    message_type
+      |> IO.inspect(label: "------------------------>>>>>>> Type")
+
+    header
+      |> IO.inspect(label: "------------------------>>>>>>> Header")
+
+    msg
+      |> IO.inspect(label: "------------------------>>>>>>> Msg")
   end
 
   def get_customer_data(customer_id) do
@@ -291,11 +338,11 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
   end
 
   def create_new_email(nil, _params) do
-    IO.puts("NOTHING EMAIL")
+    IO.puts("NIL NOTHING EMAIL")
   end
 
   def create_new_email("", _params) do
-    IO.puts("NOTHING EMAIL")
+    IO.puts("EMPTY NOTHING EMAIL")
   end
 
   def create_new_email(new_email, params) do
@@ -319,22 +366,23 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
   end
 
   def create_new_phone(nil, _params) do
-    IO.puts("NOTHING PHONE")
+    IO.puts("NIL NOTHING PHONE")
   end
 
   def create_new_phone("", _params) do
-    IO.puts("NOTHING PHONE")
+    IO.puts("Empty NOTHING PHONE")
   end
 
   def create_new_phone(new_phone, params) do
+    phone = new_phone |> get_lada_number() |> IO.inspect(label: " ----------->>>>>>>>>> PHONE DATA")
     %{
       active: true,
       catalog_id: 1,
       country_code: "+52",
       creator_user_id: 1,
       extension: "",
-      lada_code: "55",
-      number: new_phone,
+      lada_code: phone.lada,
+      number: phone.number,
       owner_id: params["customer_id"]
     }
     |> Guatemala.Phones.create_phone()
@@ -347,6 +395,10 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
         ->
           "Error" <> EctoUtil.get_errors(changeset) |> IO.inspect(label: " ------------------> ERROR")
     end
+  end
+
+  def get_lada_number(phone) do
+    phone |> Generic.get_data_phone_number()
   end
 
   defp init_fill_form() do
@@ -418,6 +470,15 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
           ],
           message: ""
         })
+      |> Map.put(:new_phone, %{
+          valid: true,
+          required: [
+              %{func: &Generic.length_10/1, message: "El teléfono de contener mínimo 10 dígitos"},
+              %{func: &Generic.lada/1, message: "Lada inválida"},
+              %{func: &Generic.only_number/1, message: "El teléfono debe ser numérico"}
+          ],
+          message: ""
+        })
   end
 
   defp fill_form() do
@@ -430,6 +491,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
       |> Map.put(:phone_selected,  "")
       |> Map.put(:comments, "")
       |> Map.put(:new_email, "")
+      |> Map.put(:new_phone, "")
   end
 
   defp update_form(form, target, update, _aux \\ "") do

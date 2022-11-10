@@ -7,6 +7,7 @@ defmodule GuatemalaWeb.ListCustomersComponent do
 
   # alias GuatemalaWeb.NotificationComponent, as: Notification
   alias Guatemala.Customers, as: Customers
+  alias Guatemala.GenericFunctions, as: Generic
 
   def mount(socket) do
     {:ok, socket}
@@ -167,8 +168,7 @@ defmodule GuatemalaWeb.ListCustomersComponent do
   end
 
   def get_phone(phone_data) do
-    "(" <> phone_data.lada_code <> ")" <> phone_data.number |> IO.inspect(label: " -------------------> NUMBER")
-      # |> Map.get(:number)
+    phone_data.lada_code <> phone_data.number |> Generic.format_phone()
   end
 
   def apply_all_filters(list_customers, params) do
