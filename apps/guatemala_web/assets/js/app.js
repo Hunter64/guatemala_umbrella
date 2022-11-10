@@ -1,4 +1,4 @@
-// let Hooks = {}
+let Hooks = {}
 
 // Hooks.SelectDarik = {
 //     mounted() {
@@ -15,6 +15,29 @@
 //         })
 //     }
 // };
+
+Hooks.PhoneFormat = {
+    mounted() {
+        console.log("------------------> HERE ")
+        this.el.addEventListener("input", e => {
+        let cleaned = ('' + this.el.value).replace(/\D/g, '');
+        if(cleaned.length > 10){
+            cleaned = cleaned.substring(0, 10)
+        }
+        let sub = cleaned.substring(0, 2)
+        let match = false
+        if (sub == "55" || sub == "56" || sub == "33" || sub == "81"){
+            match = cleaned.match(/^(\d{2})(\d{4})(\d+)$/);
+        }
+        else{
+            match = cleaned.match(/^(\d{3})(\d{3})(\d+)$/);
+        }
+        if(match) {
+            this.el.value = '(' + match[1] + ') ' + match[2] + '-' + match[3]
+        }
+    })
+    }
+  }
 
 // We import the CSS which is extracted to its own file by esbuild.
 // Remove this line if you add a your own CSS build pipeline (e.g postcss).
@@ -45,8 +68,8 @@ import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-//let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}, hooks: Hooks})
-let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}})
+let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}, hooks: Hooks})
+//let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}})
 
 // Show progress bar on live navigation and form submits
 topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
