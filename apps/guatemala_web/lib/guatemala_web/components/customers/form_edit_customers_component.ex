@@ -17,13 +17,13 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
   end
 
   def update(attrs, socket) do
-    attrs |> IO.inspect(label: " --------> ATTRS EDIT--------------------------->")
     {:ok, assign(socket,
       customer: attrs.id |> get_customer_data(),
       add_new_email: false,
       add_new_phone: false,
       form_valid: init_fill_form(),
-      form: fill_form()
+      form: fill_form(),
+      filters_to_return_from_edit: attrs.filters_to_return_from_edit
     )}
   end
 
@@ -32,7 +32,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
     <div id="form_edit_customer" class="bg-amber-100 dark:bg-slate-800 mt-16 ml-1 w-full rounded float-left">
 
       <div class="w-full py-2 bg-amber-700 dark:bg-slate-800">
-        <p class="ml-2 font-bold text-lg text-white mt-1">Editar Cliente</p>
+        <p class="ml-2 font-bold text-lg text-white mt-1">Editar Cliente <%= @customer.large_name %> </p>
       </div>
 
       <div class="h-hoch-80 px-4 w-full relative mt-2">
@@ -225,25 +225,11 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
     )}
   end
 
-  def handle_event("edit_emails", params, socket) do
-    params |> IO.inspect(label: " -------> Edit emails ")
-    socket.assigns.add_new_email |> IO.inspect(label: " -----------> socket.assigns.add_new_email")
-    # params["customer_id"] |> Guatemala.Customers.get_customer!() |> IO.inspect(label: " -----------------> CUSTOMER")
-
-    # {:noreply, socket}
-
+  def handle_event("edit_emails", _params, socket) do
     {:noreply, assign(
       socket,
       add_new_email: !socket.assigns.add_new_email
     )}
-
-    # {:noreply, assign(
-    #   socket,
-    #   new: false,
-    #   edit: true,
-    #   customer_id_edit: params["customer_id"]
-    #   )}
-
   end
 
   def handle_event("update_form", params, socket) do
@@ -254,17 +240,15 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
       socket.assigns.form_valid
         |> Generic.validate_form(target_to_edit, update_target)
 
-        target_to_edit |> IO.inspect(label: "------------------------->>>>>>>>>>>>> Target to edit")
-
-    update_target = case target_to_edit == "new_phone" do
-      true ->
-        update_target
-          |> String.replace("(", "")
-          |> String.replace(" ", "")
-          |> String.replace(")", "")
-          |> String.replace("-", "")
-      false -> update_target
-    end
+    # update_target = case target_to_edit == "new_phone" do
+    #   true ->
+    #     update_target
+    #       |> String.replace("(", "")
+    #       |> String.replace(" ", "")
+    #       |> String.replace(")", "")
+    #       |> String.replace("-", "")
+    #   false -> update_target
+    # end
 
     {:noreply, assign(
       socket,
@@ -277,9 +261,8 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
     params |> IO.inspect(label: " ----------------> PARAMS EDIT CUSTOMER")
     params["new_email"] |> create_new_email(params)
     params["new_phone"] |> create_new_phone(params)
-    # params["email_active_id"] |> Guatemala.Emails.get_email!() |> Guatemala.Emails.update_email(%{active: false}) |> IO.inspect(label: " -----------> EDIT PREVIOUS EMAIL")
     params |> update_customer()
-
+    send_update(GuatemalaWeb.ListCustomersComponent, id: "list_customers", filters: socket.assigns.filters_to_return_from_edit)
     {:noreply, socket}
   end
 
@@ -357,11 +340,10 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
     |> case do
       {:ok, email}
         ->
-          email |> IO.inspect(label: " --------------------> NEW EMAIL FOR CUSTOMER")
-          params["email_active_id"] |> Guatemala.Emails.get_email!() |> Guatemala.Emails.update_email(%{active: false}) |> IO.inspect(label: " -----------> EDIT PREVIOUS EMAIL")
+          params["email_active_id"] |> Guatemala.Emails.get_email!() |> Guatemala.Emails.update_email(%{active: false})
       {:error, %Ecto.Changeset{} = changeset}
         ->
-          "Error " <> EctoUtil.get_errors(changeset) |> IO.inspect(label: " ------------------> ERROR")
+          "Error " <> EctoUtil.get_errors(changeset)
     end
   end
 
@@ -374,7 +356,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
   end
 
   def create_new_phone(new_phone, params) do
-    phone = new_phone |> get_lada_number() |> IO.inspect(label: " ----------->>>>>>>>>> PHONE DATA")
+    phone = new_phone |> get_lada_number()
     %{
       active: true,
       catalog_id: 1,
@@ -389,11 +371,10 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
     |> case do
       {:ok, phone}
         ->
-          phone |> IO.inspect(label: " --------------------> NEW Phone FOR CUSTOMER")
-          params["phone_active_id"] |> Guatemala.Phones.get_phone!() |> Guatemala.Phones.update_phone(%{active: false}) |> IO.inspect(label: " -----------> EDIT PREVIOUS Phone")
+          params["phone_active_id"] |> Guatemala.Phones.get_phone!() |> Guatemala.Phones.update_phone(%{active: false})
       {:error, %Ecto.Changeset{} = changeset}
         ->
-          "Error" <> EctoUtil.get_errors(changeset) |> IO.inspect(label: " ------------------> ERROR")
+          "Error" <> EctoUtil.get_errors(changeset)
     end
   end
 

@@ -13,25 +13,11 @@ defmodule GuatemalaWeb.FormCustomersComponent do
   end
 
   def update(_attrs, socket) do
-    # {:ok, socket}
-
     {:ok, assign(socket,
       new: false,
-      edit: false,
       list: false,
       filters: %{}
     )}
-
-    # {:ok, assign(socket,
-    #   new: attrs.new,
-    #   edit: attrs.edit,
-    #   document_type: document_type,
-    #   form_valid: attrs.form_valid |> IO.inspect(label: " ------------------------> FORM VALID IN FORM "),
-    #   form: attrs.form |> IO.inspect(label: " -----------------> FORM ")
-    # )}
-
-    # <div class="inline-flex top-0 right-0 bg-amber-700 dark:bg-slate-800 text-white mt-2">
-    #       </div>
   end
 
   def render(assigns) do
@@ -98,9 +84,8 @@ defmodule GuatemalaWeb.FormCustomersComponent do
         </div>
 
         <div class="w-full">
-          <%= if @new, do: live_component(GuatemalaWeb.FormNewCustomersComponent, id: "new_customer", new: true, edit: false, list: false) %>
-          <%= if @edit, do: live_component(GuatemalaWeb.FormNewCustomersComponent, id: "edit_customer", new: false, edit: true, list: false) %>
-          <%= if @list, do: live_component(GuatemalaWeb.ListCustomersComponent, id: "list_customers", new: false, edit: false, list: true, filters: @filters) %>
+          <%= if @new, do: live_component(GuatemalaWeb.FormNewCustomersComponent, id: "new_customer", new: true, list: false) %>
+          <%= if @list, do: live_component(GuatemalaWeb.ListCustomersComponent, id: "list_customers", new: false, list: true, filters: @filters) %>
         </div>
 
       </div>
@@ -108,23 +93,18 @@ defmodule GuatemalaWeb.FormCustomersComponent do
   end
 
   def handle_event("search_customers", params, socket) do
-    params |> IO.inspect(label: " --------------------> params ----------------------------->>>>>>> TO SEARCH")
-
     {:noreply, assign(
       socket,
       new: false,
-      edit: false,
       list: true,
       filters: params
       )}
   end
 
   def handle_event("new_customer", _params, socket) do
-    IO.puts("HERE ------------> NEW ")
     {:noreply, assign(
       socket,
       new: true,
-      edit: false,
       list: false
       )}
   end
