@@ -1372,4 +1372,6 @@ defmodule Guatemala.GenericFunctions do
       end
   end
 
+  def is_same_data(value_1, value_2), do: value_1 == value_2
+
 end
