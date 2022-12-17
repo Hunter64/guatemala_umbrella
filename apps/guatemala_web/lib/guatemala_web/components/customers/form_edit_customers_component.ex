@@ -12,6 +12,9 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
   @success_message 1
   @error_message 2
 
+  @action_email 1
+  @action_phone 2
+
   def mount(socket) do
     {:ok, socket}
   end
@@ -48,6 +51,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
                 <input type="hidden" name="customer_id" value={@customer.id}>
                 <input type="hidden" name="email_active_id" value={@customer.email_active.id}>
                 <input type="hidden" name="phone_active_id" value={@customer.phone_active.id}>
+                <input type="hidden" name="large_name" value={@customer.large_name}>
               </div>
 
               <div class="w-full inline-flex">
@@ -258,10 +262,12 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
   end
 
   def handle_event("save_edit_customer", params, socket) do
-    params |> IO.inspect(label: " ----------------> PARAMS EDIT CUSTOMER")
-    params["new_email"] |> create_new_email(params)
-    params["new_phone"] |> create_new_phone(params)
-    params |> update_customer()
+    params
+      |> update_customer()
+      |> update_email(params)
+      |> update_phone(params)
+      |> send_notification(params)
+
     send_update(GuatemalaWeb.ListCustomersComponent, id: "list_customers", filters: socket.assigns.filters_to_return_from_edit)
     {:noreply, socket}
   end
@@ -275,13 +281,15 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
       comments: params["comments"]
     }
     params["customer_id"] |> String.to_integer |> Customers.get_customer!()
-      |> Customers.update_customer(customer)
-      |> case do
-        {:ok, customer}
-          -> send_message_notification(@success_message, "Éxito", "Cliente " <> customer.large_name <> " actualizado correctamente")
-        {:error, %Ecto.Changeset{} = changeset}
-          -> send_message_notification(@error_message, "Error", "Error al intentar actualizar el cliente " <> EctoUtil.get_errors(changeset))
-      end
+    |> Customers.update_customer(customer)
+  end
+
+  def send_notification({:ok, _params}, params_source) do
+    send_message_notification(@success_message, "Éxito", "Cliente " <> params_source["large_name"] <> " actualizado correctamente")
+  end
+
+  def send_notification({:error, %Ecto.Changeset{} = changeset}, params_source) do
+    send_message_notification(@error_message, "Error", "Error al intentar actualizar el cliente " <> params_source["large_name"] <> " " <> EctoUtil.get_errors(changeset))
   end
 
   def send_message_notification(message_type, header, msg) do
@@ -293,6 +301,66 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
 
     msg
       |> IO.inspect(label: "------------------------>>>>>>> Msg")
+  end
+
+  def update_email({:ok, _customer}, params) do
+    Generic.is_same_data(params["email_active_id"], params["email_selected"])
+      |> update_selected_email(params)
+  end
+
+  def update_email({:error, error}, _params) do
+    error |> IO.inspect(label: "------------------------->>>>>>>>>>>> Error UPDATE EMAIL")
+    {:error, error}
+  end
+
+  def update_selected_email(false, params) do
+    params["email_active_id"]
+      |> update_details_additional(@action_email, false)
+
+    params["email_selected"]
+      |> update_details_additional(@action_email, true)
+  end
+
+  def update_selected_email(true, params) do
+    {:ok, params}
+  end
+
+  def update_phone({:ok, _email}, params) do
+    Generic.is_same_data(params["phone_active_id"], params["phone_selected"])
+      |> update_selected_phone(params)
+  end
+
+  def update_phone({:error, error}, _params) do
+    error |> IO.inspect(label: "------------------------->>>>>>>>>>>> Error UPDATE PHONE")
+    {:error, error}
+  end
+
+  def update_selected_phone(false, params) do
+    params["phone_active_id"]
+      |> update_details_additional(@action_phone, false)
+
+    params["phone_selected"]
+      |> update_details_additional(@action_phone, true)
+  end
+
+  def update_selected_phone(true, params) do
+    {:ok, params}
+  end
+
+  def update_details_additional(data, action, is_selected) do
+    action
+      |> case do
+        @action_email ->
+          data
+            |> Guatemala.Emails.get_email!()
+            |> Guatemala.Emails.update_email(%{active: is_selected})
+
+        @action_phone ->
+          data
+            |> Guatemala.Phones.get_phone!()
+            |> Guatemala.Phones.update_phone(%{active: is_selected})
+
+      end
   end
 
   def get_customer_data(customer_id) do
