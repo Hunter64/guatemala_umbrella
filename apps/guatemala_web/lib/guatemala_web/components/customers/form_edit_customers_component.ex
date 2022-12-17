@@ -8,6 +8,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
   alias Guatemala.GenericFunctions, as: Generic
   alias Guatemala.Customers, as: Customers
   alias Guatemala.EctoUtil, as: EctoUtil
+  alias GuatemalaWeb.NotificationComponent, as: Notification
 
   @success_message 1
   @error_message 2
@@ -26,7 +27,9 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
       add_new_phone: false,
       form_valid: init_fill_form(),
       form: fill_form(),
-      filters_to_return_from_edit: attrs.filters_to_return_from_edit
+      filters_to_return_from_edit: attrs.filters_to_return_from_edit,
+      description_alert: nil,
+      change: false
     )}
   end
 
@@ -218,6 +221,8 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
         </form>
       </div>
 
+      <%= if @description_alert, do: live_component(GuatemalaWeb.NotificationComponent, id: @notification_type, header: @header, description_alert: @description_alert, show: true, notification_type: @notification_type, change: @change) %>
+
     </div>
     """
   end
@@ -266,10 +271,10 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
       |> update_customer()
       |> update_email(params)
       |> update_phone(params)
-      |> send_notification(params)
+      |> send_notification(params, socket)
 
-    send_update(GuatemalaWeb.ListCustomersComponent, id: "list_customers", filters: socket.assigns.filters_to_return_from_edit)
-    {:noreply, socket}
+    # send_update(GuatemalaWeb.ListCustomersComponent, id: "list_customers", filters: socket.assigns.filters_to_return_from_edit)
+    # {:noreply, socket}
   end
 
   def update_customer(params) do
@@ -284,23 +289,50 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
     |> Customers.update_customer(customer)
   end
 
-  def send_notification({:ok, _params}, params_source) do
-    send_message_notification(@success_message, "Éxito", "Cliente " <> params_source["large_name"] <> " actualizado correctamente")
+  def send_notification({:ok, _params}, params_source, socket) do
+    send_message_notification(@success_message, "Éxito", "Cliente " <> params_source["large_name"] <> " actualizado correctamente", socket, "succesfully")
   end
 
-  def send_notification({:error, %Ecto.Changeset{} = changeset}, params_source) do
-    send_message_notification(@error_message, "Error", "Error al intentar actualizar el cliente " <> params_source["large_name"] <> " " <> EctoUtil.get_errors(changeset))
+  def send_notification({:error, %Ecto.Changeset{} = changeset}, params_source, socket) do
+    send_message_notification(@error_message, "Error", "Error al intentar actualizar el cliente " <> params_source["large_name"] <> " " <> EctoUtil.get_errors(changeset), socket, "error")
   end
 
-  def send_message_notification(message_type, header, msg) do
+  def send_message_notification(message_type, header, msg, socket, notification_type) do
     message_type
-      |> IO.inspect(label: "------------------------>>>>>>> Type")
+      |> case do
+        @success_message ->
+          Notification.set_timer_notificacion()
+          # send_update(GuatemalaWeb.ListCustomersComponent, id: "list_customers", filters: socket.assigns.filters_to_return_from_edit)
+        @error_message ->
+          Notification.set_timer_notification_error()
+        # @warning_message ->
+        #     Notification.set_timer_notification_warning()
+        # _ ->
+        #   Notification.set_timer_notificacion()
+      end
 
-    header
-      |> IO.inspect(label: "------------------------>>>>>>> Header")
+    {:noreply, assign(
+      socket,
 
-    msg
-      |> IO.inspect(label: "------------------------>>>>>>> Msg")
+      header: header,
+      description_alert: msg,
+      change: !socket.assigns.change,
+      #session: socket.assigns.session,
+      notification_type: notification_type
+      )
+    }
+
+  end
+
+  def create_map_notification(message_type, header, msg, notification_type) do
+    %{
+      id: notification_type,
+      header: header,
+      description_alert: msg,
+      show: true,
+      notification_type: notification_type,
+      message_type: message_type
+    }
   end
 
   def update_email({:ok, _customer}, params) do
@@ -406,7 +438,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
     }
     |> Guatemala.Emails.create_email()
     |> case do
-      {:ok, email}
+      {:ok, _email}
         ->
           params["email_active_id"] |> Guatemala.Emails.get_email!() |> Guatemala.Emails.update_email(%{active: false})
       {:error, %Ecto.Changeset{} = changeset}
@@ -437,7 +469,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
     }
     |> Guatemala.Phones.create_phone()
     |> case do
-      {:ok, phone}
+      {:ok, _phone}
         ->
           params["phone_active_id"] |> Guatemala.Phones.get_phone!() |> Guatemala.Phones.update_phone(%{active: false})
       {:error, %Ecto.Changeset{} = changeset}
