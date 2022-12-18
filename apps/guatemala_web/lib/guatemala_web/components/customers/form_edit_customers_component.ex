@@ -322,7 +322,7 @@ defmodule GuatemalaWeb.FormEditCustomersComponent do
       |> case do
         @success_message ->
           Notification.set_timer_notificacion()
-          # send_update(GuatemalaWeb.ListCustomersComponent, id: "list_customers", filters: socket.assigns.filters_to_return_from_edit)
+          send_update(GuatemalaWeb.ListCustomersComponent, id: "list_customers", filters: socket.assigns.filters_to_return_from_edit)
         @error_message ->
           Notification.set_timer_notification_error()
         # @warning_message ->
