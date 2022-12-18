@@ -22,7 +22,7 @@ defmodule GuatemalaWeb.Router do
     get "/", HomeController, :index
     get "/home", HomeController, :index
     get "/document_types", DocumentTypeController, :index
-    get "/catalogs", CatalogController, :index
+    # get "/catalogs", CatalogController, :index
     get "/credit_types", CreditTypeController, :index
     get "/customers", CustomerController, :index
   end
