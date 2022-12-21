@@ -25,6 +25,7 @@ defmodule GuatemalaWeb.Router do
     # get "/catalogs", CatalogController, :index
     get "/credit_types", CreditTypeController, :index
     get "/customers", CustomerController, :index
+    get "/products", ProductController, :index
   end
 
   # Other scopes may use custom stacks.
