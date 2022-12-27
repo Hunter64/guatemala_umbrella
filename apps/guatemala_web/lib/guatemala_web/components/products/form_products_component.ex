@@ -49,11 +49,11 @@ defmodule GuatemalaWeb.FormProductsComponent do
                 </div>
 
                 <div class="py-2">
-                  <button type="submit" form="form_to_search_product" class="shadow py-2 bg-green-500 dark:bg-green-400 hover:bg-green-400 dark:hover:bg-green-300 text-white items-center inline-flex font-bold rounded text-sm w-full">
+                  <button type="submit" form="form_to_search_product" class="shadow py-2 bg-green-500 dark:bg-green-400 hover:bg-green-400 dark:hover:bg-green-300 text-slate-900 dark:text-white items-center inline-flex font-bold rounded text-sm w-full">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 mr-2 ml-auto">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                     </svg>
-                    <label class="cursor-pointer mr-auto text-white">Buscar</label>
+                    <label class="cursor-pointer mr-auto text-slate-900 dark:text-white">Buscar</label>
                   </button>
                 </div>
 
