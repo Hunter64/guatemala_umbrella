@@ -37,117 +37,174 @@ defmodule GuatemalaWeb.ListProductsComponent do
           <p class="ml-2 font-bold text-lg text-white mt-1">Listado de Productos</p>
         </div>
 
-          <div class="p-3">
-              <div class="overflow-x-auto">
-                  <table class="table-auto w-full">
-                      <thead class="text-xs font-bold uppercase text-white bg-amber-700 dark:bg-slate-400">
-                          <tr>
-                              <th class="p-2 whitespace-nowrap w-10/100">
-                                  <div class="text-left">Clave</div>
-                              </th>
-                              <th class="p-2 whitespace-nowrap w-65/100">
-                                  <div class="text-left">Descripción</div>
-                              </th>
-                              <th class="p-2 whitespace-nowrap w-15/100">
-                                  <div class="text-left">Stock</div>
-                              </th>
-                              <th class="p-2 whitespace-nowrap w-10/100">
-                                  <div class="text-center">Estatus</div>
-                              </th>
-                          </tr>
-                      </thead>
-                      <tbody class="text-sm ">
-                        <%= for item <- @all_products do %>
-                          <tr class="bg-amber-100 dark:bg-slate-200 hover:bg-stone-100 dark:hover:bg-stone-400 w-full cursor-pointer divide-y divide-gray-800 dark:divide-gray-100" phx-click="show_details" phx-value-data={item.id} phx-target="#list_products">
-                            <td class="p-2 whitespace-nowrap w-10/100">
-                              <div class="text-left"><%= item.code %></div>
-                            </td>
-                            <td class="p-2 whitespace-nowrap w-65/100">
-                              <div class="text-left"><%= item.description %></div>
-                            </td>
-                            <td class="p-2 whitespace-nowrap w-15/100">
-                              <%= if item.stock_value >= 10 do %>
-                                <div class="text-left font-medium bg-green-300">
+
+
+
+        <div class="flex flex-col">
+          <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div class="py-4 inline-block min-w-full sm:px-6 lg:px-8">
+              <div class="overflow-hidden">
+                <table class="min-w-full text-center">
+                  <thead class="border-b bg-gray-800">
+                    <tr>
+                      <th scope="col" class="text-sm font-medium text-white px-6 py-2">
+                        Clave
+                      </th>
+                      <th scope="col" class="text-sm font-medium text-white px-6 py-2">
+                        Descripción
+                      </th>
+                      <th scope="col" class="text-sm font-medium text-white px-6 py-2">
+                        Stock
+                      </th>
+                      <th scope="col" class="text-sm font-medium text-white px-6 py-2">
+                        Estatus
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <%= for item <- @all_products do %>
+                      <%= if item.id == (@data_details |> Map.get(:id)) && @show_details do %>
+                        <tr class="border-t-2 border-t-stone-700 border-l-2 border-l-stone-700 border-r-2 border-r-stone-700 bg-stone-300 hover:bg-stone-300 cursor-pointer" phx-click="show_details" phx-value-data={item.id} phx-target="#list_products">
+                          <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <div class="inline-flex w-full">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 mr-5">
+                                <path fill-rule="evenodd" d="M11.47 7.72a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06L12 9.31l-6.97 6.97a.75.75 0 01-1.06-1.06l7.5-7.5z" clip-rule="evenodd" />
+                              </svg>
+                              <p><%= item.code %></p>
+                            </div>
+                          </td>
+                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                            <%= item.description %>
+                          </td>
+                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                            <%= if item.stock_value >= 10 do %>
+                              <div class="bg-green-300 border-solid border-2 border-green-400 rounded">
+                                <%= item.stock_value %>
+                              </div>
+                            <% else %>
+                              <%= if item.stock_value >= 5 && item.stock_value < 10 do %>
+                                <div class="bg-yellow-300 border-solid border-2 border-yellow-400 rounded">
                                   <%= item.stock_value %>
                                 </div>
                               <% else %>
-                                <%= if item.stock_value >= 5 && item.stock_value < 10 do %>
-                                  <div class="text-left font-medium bg-yellow-300">
-                                    <%= item.stock_value %>
-                                  </div>
-                                <% else %>
-                                  <div class="text-left font-medium bg-red-300">
-                                    <%= item.stock_value %>
-                                  </div>
-                                <% end %>
+                                <div class="bg-red-300 border-solid border-2 border-red-400 rounded px-5">
+                                  <%= item.stock_value %>
+                                </div>
                               <% end %>
-                            </td>
-                            <td class="p-2 whitespace-nowrap w-10/100">
-                              <%= if item.active do %>
-                                <div class="font-medium">
-                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
-                                    <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" class="text-green-500" />
-                                  </svg>
+                            <% end %>
+                          </td>
+                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap flex justify-center">
+                            <%= if item.active do %>
+                              <div class="font-medium">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                                  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" class="text-green-500" />
+                                </svg>
+                              </div>
+                            <% else %>
+                              <div class="font-medium">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                                  <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd" class="text-red-500" />
+                                </svg>
+                              </div>
+                            <% end %>
+                          </td>
+                        </tr>
+                      <% else %>
+                        <tr class="bg-stone-100 border-b border-stone-300 hover:bg-stone-300 cursor-pointer" phx-click="show_details" phx-value-data={item.id} phx-target="#list_products">
+                          <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <div class="inline-flex w-full">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 mr-5">
+                                <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+                              </svg>
+                              <p><%= item.code %></p>
+                            </div>
+                          </td>
+                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                            <%= item.description %>
+                          </td>
+                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                            <%= if item.stock_value >= 10 do %>
+                              <div class="bg-green-300 border-solid border-2 border-green-600 rounded">
+                                <%= item.stock_value %>
+                              </div>
+                            <% else %>
+                              <%= if item.stock_value >= 5 && item.stock_value < 10 do %>
+                                <div class="bg-yellow-300 border-solid border-2 border-yellow-600 rounded">
+                                  <%= item.stock_value %>
                                 </div>
                               <% else %>
-                                <div class="font-medium">
-                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
-                                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd" class="text-red-500" />
-                                  </svg>
+                                <div class="bg-red-300 border-solid border-2 border-red-600 rounded px-5">
+                                  <%= item.stock_value %>
                                 </div>
                               <% end %>
-                            </td>
-                          </tr>
+                            <% end %>
+                          </td>
+                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap flex justify-center">
+                            <%= if item.active do %>
+                              <div class="font-medium">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                                  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" class="text-green-500" />
+                                </svg>
+                              </div>
+                            <% else %>
+                              <div class="font-medium">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                                  <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clip-rule="evenodd" class="text-red-500" />
+                                </svg>
+                              </div>
+                            <% end %>
+                          </td>
+                        </tr>
+                      <% end %>
 
-                          <%= if @show_details && item.id == (@data_details |> Map.get(:id)) do %>
-                            <tr class="w-full bg-amber-200 dark:bg-slate-300 ">
+                      <%= if @show_details && item.id == (@data_details |> Map.get(:id)) do %>
+                        <tr class="bg-stone-300 border-l-2 border-l-stone-700 border-r-2 border-r-stone-700">
+                          <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                            Precio: $ <%= @data_details.price %>.00 MXN
+                          </td>
+                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                            Marca:
+                              <b><%= @data_details.trademark %></b>
+                            Proveedor:
+                              <b><%= @data_details.provider %></b>
+                            Tipo:
+                              <b><%= @data_details.product_type %></b>
+                          </td>
+                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                            XXX
+                          </td>
+                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                            YYY
+                          </td>
+                        </tr>
+                        <tr class="bg-stone-300 border-b-2 border-b-stone-700 border-l-2 border-l-stone-700 border-r-2 border-r-stone-700">
+                          <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                            Descuento: $ <%= @data_details.discount %>.00 MXN
+                          </td>
+                          <td colspan="2" class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap text-center">
+                            Total: <b>$ <%= @data_details.real_price %>.00 MXN</b>
+                          </td>
+                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                            ZZZ
+                          </td>
+                        </tr>
+                      <% end %>
 
-                                <td class="p-2 whitespace-nowrap w-10/100">
-                                  Precio: $ <%= @data_details.price %>.00 MXN
-                                </td>
-                                <td class="p-2 whitespace-nowrap w-65/100">
-                                  Marca:
-                                    <b><%= @data_details.trademark %></b>
-                                  Proveedor:
-                                    <b><%= @data_details.provider %></b>
-                                  Tipo:
-                                    <b><%= @data_details.product_type %></b>
-                                </td>
-                                <td class="p-2 whitespace-nowrap w-15/100">
-
-                                </td>
-                                <td class="p-2 whitespace-nowrap w-10/100">
-
-                                </td>
-
-                            </tr>
-                            <tr class="w-full bg-amber-200 dark:bg-slate-300 ">
-
-                                <td class="p-2 whitespace-nowrap w-10/100">
-                                  Descuento: $ <%= @data_details.discount %>.00 MXN
-                                </td>
-                                <td class="p-2 whitespace-nowrap w-65/100">
-                                  Total: <b>$ <%= @data_details.real_price %>.00 MXN</b>
-                                </td>
-                                <td class="p-2 whitespace-nowrap w-15/100">
-
-                                </td>
-                                <td class="p-2 whitespace-nowrap w-10/100">
-
-                                </td>
-
-                            </tr>
-                          <% end %>
-
-                        <% end %>
-                      </tbody>
-                  </table>
-
-                  <div class="w-full text-black dark:text-white mt-2 tx-sm">
-                    Total de Registros:  <b><%= @all_products |> Enum.count %></b>
-                  </div>
+                    <% end %>
+                  </tbody>
+                </table>
+                <p class="text-sm">Total de Registros:  <b><%= @all_products |> Enum.count %></b></p>
               </div>
+            </div>
           </div>
+        </div>
+
+
+
+
+
+
+
       </div>
 
     </div>
