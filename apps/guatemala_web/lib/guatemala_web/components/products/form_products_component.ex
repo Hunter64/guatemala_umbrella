@@ -45,7 +45,7 @@ defmodule GuatemalaWeb.FormProductsComponent do
 
                 <div class="py-2">
                   <label class="text-base font-normal text-amber-700 dark:text-white">Nombre / Descripción:</label>
-                  <input type="text" name="large_name" maxlength="128" class="shadow w-full px-2 py-1 border-amber-100 focus:border-amber-500 text-sm appearance-none block text-gray-700 border rounded leading-tight focus:outline-none focus:bg-white" phx-value-name="large_name" phx-target="#form_products" id="input_large_name" placeholder="Nombre / Descripción" value="">
+                  <input type="text" name="description" maxlength="128" class="shadow w-full px-2 py-1 border-amber-100 focus:border-amber-500 text-sm appearance-none block text-gray-700 border rounded leading-tight focus:outline-none focus:bg-white" phx-value-name="description" phx-target="#form_products" id="input_description" placeholder="Nombre / Descripción" value="">
                 </div>
 
                 <div class="py-2">
@@ -74,7 +74,7 @@ defmodule GuatemalaWeb.FormProductsComponent do
         </div>
 
         <div class="w-full">
-          <%= if @new, do: live_component(GuatemalaWeb.FormNewProductsComponent, id: "new_product", new: true, list: false) %>
+          <%!-- <%= if @new, do: live_component(GuatemalaWeb.FormNewProductsComponent, id: "new_product", new: true, list: false) %> --%>
           <%= if @list, do: live_component(GuatemalaWeb.ListProductsComponent, id: "list_products", new: false, list: true, filters: @filters) %>
         </div>
 

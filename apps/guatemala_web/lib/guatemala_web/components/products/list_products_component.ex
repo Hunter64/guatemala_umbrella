@@ -7,20 +7,24 @@ defmodule GuatemalaWeb.ListProductsComponent do
 
   # alias GuatemalaWeb.NotificationComponent, as: Notification
   alias Guatemala.Products, as: Products
-  # alias Guatemala.GenericFunctions, as: Generic
+  alias Guatemala.GenericFunctions, as: Generic
 
   def mount(socket) do
     {:ok, socket}
   end
 
   def update(attrs, socket) do
+    attrs |> IO.inspect(label: "--------------------------------->>>>>>>>>> ATTRS")
+
+    attrs.filters["clave"] |> IO.inspect(label: "--------------- CLAVE")
+
     {:ok, assign(socket,
       new: false,
       show_details: false,
       list: true,
       product_id_show: 0,
       filters_to_return_from_edit: attrs.filters,
-      all_products: Products.list_products() |> add_stock_for_test(),
+      all_products: Products.list_products() |> apply_filters(attrs.filters) |> add_stock_for_test(),
       data_details: %{}
     )}
 
@@ -228,6 +232,32 @@ defmodule GuatemalaWeb.ListProductsComponent do
       data_details: params["data"] |> Products.get_product!() |> add_other_details() |> IO.inspect(label: "------------------------------>>>>> DATA DETaILS")
       )}
       # |> IO.inspect(label: "-----------------<<<<<<<< ALL-")
+  end
+
+  def apply_filters(products_list, filters) do
+    clave = filters["clave"]
+    description = filters["description"]
+
+    list_filtered =
+      clave |> Generic.valid_string_data() |> case do
+        true ->
+          products_list
+            |> Enum.filter(fn x -> String.contains?(Generic.downcase(x.code), String.downcase(clave)) end)
+        false ->
+          products_list
+      end
+
+    list_filtered =
+      description |> Generic.valid_string_data() |> case do
+        true ->
+          list_filtered
+            |> Enum.filter(fn x -> String.contains?(Generic.downcase(x.description), String.downcase(description)) end)
+        false ->
+          list_filtered
+      end
+
+      list_filtered
+
   end
 
   def add_other_details(basic_data_product) do
