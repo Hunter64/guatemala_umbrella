@@ -91,7 +91,17 @@ defmodule Guatemala.GenericFunctions do
 
   """
   def valid_string_data(nil), do: false
-  def valid_string_data(string_data), do: !String.equivalent?(string_data |> String.trim, "")
+  def valid_string_data(data) do
+    data
+      |> is_bitstring()
+      |> case do
+        true ->
+          !String.equivalent?(data |> String.trim, "")
+        false ->
+          false
+      end
+  end
+  # def valid_string_data(string_data), do: !String.equivalent?(string_data |> String.trim, "")
 
   @doc """
   Receives a numeric value as a string and transforms it to float.
