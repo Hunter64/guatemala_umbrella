@@ -61,7 +61,7 @@ defmodule GuatemalaWeb.ListProductsComponent do
                   <tbody>
                     <%= for item <- @all_products do %>
                       <%= if item.id == (@data_details |> Map.get(:id)) && @show_details do %>
-                        <tr class="border-t-2 border-t-stone-700 dark:border-t-gray-100 border-l-2 border-l-stone-700 dark:border-l-gray-100 border-r-2 border-r-stone-700 dark:border-r-gray-100 bg-stone-300 dark:bg-gray-700 hover:bg-stone-300 cursor-pointer" phx-click="show_details" phx-value-data={item.id} phx-target="#list_products">
+                        <tr class="border-t-2 border-t-stone-700 dark:border-t-gray-100 border-l-2 border-l-stone-700 dark:border-l-gray-100 border-r-2 border-r-stone-700 dark:border-r-gray-100 bg-stone-300 dark:bg-gray-700 hover:bg-stone-300 hover:bg-gray-600 cursor-pointer" phx-click="show_details" phx-value-data={item.id} phx-target="#list_products">
                           <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                             <div class="inline-flex w-full">
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 mr-5">
@@ -107,7 +107,7 @@ defmodule GuatemalaWeb.ListProductsComponent do
                           </td>
                         </tr>
                       <% else %>
-                        <tr class="bg-stone-100 dark:bg-gray-500 border-b border-stone-300 hover:bg-stone-300 cursor-pointer" phx-click="show_details" phx-value-data={item.id} phx-target="#list_products">
+                        <tr class="bg-stone-100 dark:bg-gray-500 border-b border-stone-300 hover:bg-stone-300 dark:hover:bg-gray-600 cursor-pointer" phx-click="show_details" phx-value-data={item.id} phx-target="#list_products">
                           <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                             <div class="inline-flex w-full">
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 mr-5">
