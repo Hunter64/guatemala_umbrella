@@ -37,15 +37,12 @@ defmodule GuatemalaWeb.ListProductsComponent do
           <p class="ml-2 font-bold text-lg text-white mt-1">Listado de Productos</p>
         </div>
 
-
-
-
         <div class="flex flex-col">
           <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div class="py-4 inline-block min-w-full sm:px-6 lg:px-8">
               <div class="overflow-hidden">
                 <table class="min-w-full text-center">
-                  <thead class="border-b bg-gray-800">
+                  <thead class="border-b bg-gray-800 dark:bg-gray-600">
                     <tr>
                       <th scope="col" class="text-sm font-medium text-white px-6 py-2">
                         Clave
@@ -64,8 +61,8 @@ defmodule GuatemalaWeb.ListProductsComponent do
                   <tbody>
                     <%= for item <- @all_products do %>
                       <%= if item.id == (@data_details |> Map.get(:id)) && @show_details do %>
-                        <tr class="border-t-2 border-t-stone-700 border-l-2 border-l-stone-700 border-r-2 border-r-stone-700 bg-stone-300 hover:bg-stone-300 cursor-pointer" phx-click="show_details" phx-value-data={item.id} phx-target="#list_products">
-                          <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <tr class="border-t-2 border-t-stone-700 dark:border-t-gray-100 border-l-2 border-l-stone-700 dark:border-l-gray-100 border-r-2 border-r-stone-700 dark:border-r-gray-100 bg-stone-300 dark:bg-gray-700 hover:bg-stone-300 cursor-pointer" phx-click="show_details" phx-value-data={item.id} phx-target="#list_products">
+                          <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                             <div class="inline-flex w-full">
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 mr-5">
                                 <path fill-rule="evenodd" d="M11.47 7.72a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06L12 9.31l-6.97 6.97a.75.75 0 01-1.06-1.06l7.5-7.5z" clip-rule="evenodd" />
@@ -73,21 +70,21 @@ defmodule GuatemalaWeb.ListProductsComponent do
                               <p><%= item.code %></p>
                             </div>
                           </td>
-                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                          <td class="text-sm text-gray-900 dark:text-white font-light px-6 py-2 whitespace-nowrap">
                             <%= item.description %>
                           </td>
-                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                          <td class="text-sm text-gray-900 dark:text-white font-light px-6 py-2 whitespace-nowrap">
                             <%= if item.stock_value >= 10 do %>
-                              <div class="bg-green-300 border-solid border-2 border-green-400 rounded">
+                              <div class="bg-green-300 dark:bg-green-500 border-solid border-2 border-green-400 rounded">
                                 <%= item.stock_value %>
                               </div>
                             <% else %>
                               <%= if item.stock_value >= 5 && item.stock_value < 10 do %>
-                                <div class="bg-yellow-300 border-solid border-2 border-yellow-400 rounded">
+                                <div class="bg-yellow-300 dark:bg-yellow-500 border-solid border-2 border-yellow-400 rounded">
                                   <%= item.stock_value %>
                                 </div>
                               <% else %>
-                                <div class="bg-red-300 border-solid border-2 border-red-400 rounded px-5">
+                                <div class="bg-red-300 dark:bg-red-500 border-solid border-2 border-red-400 rounded px-5">
                                   <%= item.stock_value %>
                                 </div>
                               <% end %>
@@ -110,8 +107,8 @@ defmodule GuatemalaWeb.ListProductsComponent do
                           </td>
                         </tr>
                       <% else %>
-                        <tr class="bg-stone-100 border-b border-stone-300 hover:bg-stone-300 cursor-pointer" phx-click="show_details" phx-value-data={item.id} phx-target="#list_products">
-                          <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <tr class="bg-stone-100 dark:bg-gray-500 border-b border-stone-300 hover:bg-stone-300 cursor-pointer" phx-click="show_details" phx-value-data={item.id} phx-target="#list_products">
+                          <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                             <div class="inline-flex w-full">
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 mr-5">
                                 <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
@@ -119,27 +116,27 @@ defmodule GuatemalaWeb.ListProductsComponent do
                               <p><%= item.code %></p>
                             </div>
                           </td>
-                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                          <td class="text-sm text-gray-900 dark:text-white font-light px-6 py-2 whitespace-nowrap">
                             <%= item.description %>
                           </td>
-                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                          <td class="text-sm text-gray-900 dark:text-white font-light px-6 py-2 whitespace-nowrap">
                             <%= if item.stock_value >= 10 do %>
-                              <div class="bg-green-300 border-solid border-2 border-green-600 rounded">
+                              <div class="bg-green-300 dark:bg-green-500 border-solid border-2 border-green-600 rounded">
                                 <%= item.stock_value %>
                               </div>
                             <% else %>
                               <%= if item.stock_value >= 5 && item.stock_value < 10 do %>
-                                <div class="bg-yellow-300 border-solid border-2 border-yellow-600 rounded">
+                                <div class="bg-yellow-300 dark:bg-yellow-500 border-solid border-2 border-yellow-600 rounded">
                                   <%= item.stock_value %>
                                 </div>
                               <% else %>
-                                <div class="bg-red-300 border-solid border-2 border-red-600 rounded px-5">
+                                <div class="bg-red-300 dark:bg-red-500 border-solid border-2 border-red-600 rounded px-5">
                                   <%= item.stock_value %>
                                 </div>
                               <% end %>
                             <% end %>
                           </td>
-                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap flex justify-center">
+                          <td class="text-sm text-gray-900 dark:text-white font-light px-6 py-2 whitespace-nowrap flex justify-center">
                             <%= if item.active do %>
                               <div class="font-medium">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
@@ -158,11 +155,11 @@ defmodule GuatemalaWeb.ListProductsComponent do
                       <% end %>
 
                       <%= if @show_details && item.id == (@data_details |> Map.get(:id)) do %>
-                        <tr class="bg-stone-300 border-l-2 border-l-stone-700 border-r-2 border-r-stone-700">
-                          <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <tr class="bg-stone-300 dark:bg-gray-700 border-l-2 border-l-stone-700 dark:border-l-gray-100 border-r-2 border-r-stone-700 dark:border-r-gray-100">
+                          <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                             Precio: $ <%= @data_details.price %>.00 MXN
                           </td>
-                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                          <td class="text-sm text-gray-900 dark:text-white font-light px-6 py-2 whitespace-nowrap">
                             Marca:
                               <b><%= @data_details.trademark %></b>
                             Proveedor:
@@ -170,21 +167,21 @@ defmodule GuatemalaWeb.ListProductsComponent do
                             Tipo:
                               <b><%= @data_details.product_type %></b>
                           </td>
-                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                          <td class="text-sm text-gray-900 dark:text-white font-light px-6 py-2 whitespace-nowrap">
                             XXX
                           </td>
-                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                          <td class="text-sm text-gray-900 dark:text-white font-light px-6 py-2 whitespace-nowrap">
                             YYY
                           </td>
                         </tr>
-                        <tr class="bg-stone-300 border-b-2 border-b-stone-700 border-l-2 border-l-stone-700 border-r-2 border-r-stone-700">
-                          <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <tr class="bg-stone-300 dark:bg-gray-700 border-b-2 border-b-stone-700 dark:border-b-gray-100 border-l-2 border-l-stone-700 dark:border-l-gray-100 border-r-2 border-r-stone-700 dark:border-r-gray-100">
+                          <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                             Descuento: $ <%= @data_details.discount %>.00 MXN
                           </td>
-                          <td colspan="2" class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap text-center">
+                          <td colspan="2" class="text-sm text-gray-900 dark:text-white font-light px-6 py-2 whitespace-nowrap text-center">
                             Total: <b>$ <%= @data_details.real_price %>.00 MXN</b>
                           </td>
-                          <td class="text-sm text-gray-900 font-light px-6 py-2 whitespace-nowrap">
+                          <td class="text-sm text-gray-900 dark:text-white font-light px-6 py-2 whitespace-nowrap">
                             ZZZ
                           </td>
                         </tr>
@@ -193,7 +190,7 @@ defmodule GuatemalaWeb.ListProductsComponent do
                     <% end %>
                   </tbody>
                 </table>
-                <p class="text-sm">Total de Registros:  <b><%= @all_products |> Enum.count %></b></p>
+                <p class="text-sm text-black dark:text-white">Total de Registros:  <b><%= @all_products |> Enum.count %></b></p>
               </div>
             </div>
           </div>
